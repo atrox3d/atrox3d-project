@@ -40,7 +40,7 @@ def normalize(params:list[str], rules:list[list[str]]):
     replace: str
     for target, replace in rules:
         substitutions[replace] = target
-    log.debug(substitutions)
+    log.info(substitutions)
 
     # apply all the rules
     for replace, targets in substitutions.items():
