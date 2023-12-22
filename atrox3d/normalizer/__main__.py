@@ -3,6 +3,7 @@ import logging
 
 from ..modules import logger
 from ..modules import parser
+from .normalizer import normalize
 
 log = logger.get_logger(name=__name__, level=logging.INFO)
 
