@@ -6,9 +6,10 @@ from modules import parser
 
 log = logger.get_logger(name=__name__, level=logging.INFO)
 
-def normalize(params:list[str], rules:list[list[str, str]]):
+def normalize(text: str, rules: list[list[str, str]]=None):
     # join alla parameters with a dash and convert everything to lowercase
-    text = "-".join(params)
+    # text = "-".join(params)
+    # text = text.replace(' ', '-')
     text = text.lower()
 
     # first rule, converto to a dash every char of this string
@@ -33,6 +34,7 @@ def normalize(params:list[str], rules:list[list[str, str]]):
     # add custom rules from command line
     target: str
     replace: str
+    rules = rules or []
     substitutions.update({replace:target for target, replace in rules})
     log.debug(substitutions)
 
@@ -68,6 +70,7 @@ def main():
     rules = args.replace
     log.debug(f'{rules=}')
 
+    params = " ".join(params)
     text = normalize(params, rules)
     print(text)
 
