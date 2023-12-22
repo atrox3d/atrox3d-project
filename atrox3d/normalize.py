@@ -11,14 +11,14 @@ log = logger.get_logger(
 )
 
 
-def normalize(params, rules):
+def normalize(params:list[str], rules:list[list[str]]):
     # join alla parameters with a dash and convert everything to lowercase
     text = "-".join(params)
     text = text.lower()
 
     # first rule, converto to a dash every char of this string
     dash = "-"
-    to_dash = " ,;:"
+    to_dash = " ,;:+"
 
     # second rule, converto to dot every combination of dot-dash
     dot = "."
@@ -30,11 +30,14 @@ def normalize(params, rules):
 
     # dictionary of rules
     substitutions = {
+        # target: replace
         dash: to_dash,
         dot: to_dot,
         nothing: to_nothing,
     }
     # add custom rules from command line
+    target: str
+    replace: str
     for target, replace in rules:
         substitutions[replace] = target
     log.debug(substitutions)
@@ -56,8 +59,8 @@ def normalize(params, rules):
 def main():
     # get all command line parameters, excluding the first
     # params = sys.argv[1:]
-    parser = parser.get_parser()
-    args = parser.parse_args()
+    parse = parser.get_parser()
+    args = parse.parse_args()
 
     params = args.tokens
     log.debug(f'{params=}')
@@ -72,5 +75,5 @@ def main():
     text = normalize(params, rules)
     print(text)
 
-if __name__ == '__name__':
+if __name__ == '__main__':
     main()
