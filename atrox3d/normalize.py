@@ -11,7 +11,7 @@ log = logger.get_logger(
 )
 
 
-def normalize(params:list[str], rules:list[list[str]]):
+def normalize(params:list[str], rules:list[list[str, str]]):
     # join alla parameters with a dash and convert everything to lowercase
     text = "-".join(params)
     text = text.lower()
@@ -38,9 +38,8 @@ def normalize(params:list[str], rules:list[list[str]]):
     # add custom rules from command line
     target: str
     replace: str
-    for target, replace in rules:
-        substitutions[replace] = target
-    log.info(substitutions)
+    substitutions.update({replace:target for target, replace in rules})
+    log.debug(substitutions)
 
     # apply all the rules
     for replace, targets in substitutions.items():
@@ -48,9 +47,12 @@ def normalize(params:list[str], rules:list[list[str]]):
             log.debug(f'replacing {target} with {replace}')
             text = text.replace(target, replace)
 
-    # last touch: remove multiple dashes
+    # last touches: remove multiple dashes
     while "--" in text:
         text = text.replace("--", "-")
+    
+    text = text.lstrip('-')
+    text = text.rstrip('-')
 
     # prints the final string, ready to be processed by the shell
     return text
