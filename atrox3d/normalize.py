@@ -6,7 +6,7 @@ from modules import parser
 
 log = logger.get_logger(name=__name__, level=logging.INFO)
 
-def normalize(text: str, rules: list[list[str, str]]=None):
+def normalize(text: str, rules: list[list[str]]=None):
     # join alla parameters with a dash and convert everything to lowercase
     # text = "-".join(params)
     # text = text.replace(' ', '-')
