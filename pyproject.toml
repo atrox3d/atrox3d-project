@@ -6,5 +6,5 @@ build-backend = "setuptools.build_meta"
 name = "atrox3d"
 version ="1.0.0"
 
-# [project.scripts]
-# snakey = "snakesay.__main__:main"
+[project.scripts]
+normalize = "atrox3d.normalizer.__main__:main"
