@@ -10,57 +10,67 @@ log = logger.get_logger(
                     level=logging.INFO
 )
 
-# get all command line parameters, excluding the first
-# params = sys.argv[1:]
-parser = parser.get_parser()
-args = parser.parse_args()
 
-params = args.tokens
-log.debug(f'{params=}')
-log.debug(f'{len(params)=}')
-if not len(params):
-    log.fatal('missing parameters')
-    exit(1)
+def normalize(params, rules):
+    # join alla parameters with a dash and convert everything to lowercase
+    text = "-".join(params)
+    text = text.lower()
 
-rules = args.replace
-log.debug(f'{rules=}')
+    # first rule, converto to a dash every char of this string
+    dash = "-"
+    to_dash = " ,;:"
 
-# join alla parameters with a dash and convert everything to lowercase
-text = "-".join(params)
-text = text.lower()
+    # second rule, converto to dot every combination of dot-dash
+    dot = "."
+    to_dot = [".-"]  # this is considered as one
 
-# first rule, converto to a dash every char of this string
-dash = "-"
-to_dash = " ,;:"
+    # third rule, delete parenthesis
+    nothing = ""
+    to_nothing = "()[]{}"
 
-# second rule, converto to dot every combination of dot-dash
-dot = "."
-to_dot = [".-"]  # this is considered as one
+    # dictionary of rules
+    substitutions = {
+        dash: to_dash,
+        dot: to_dot,
+        nothing: to_nothing,
+    }
+    # add custom rules from command line
+    for target, replace in rules:
+        substitutions[replace] = target
+    log.debug(substitutions)
 
-# third rule, delete parenthesis
-nothing = ""
-to_nothing = "()[]{}"
+    # apply all the rules
+    for replace, targets in substitutions.items():
+        for target in targets:
+            log.debug(f'replacing {target} with {replace}')
+            text = text.replace(target, replace)
 
-# dictionary of rules
-substitutions = {
-    dash: to_dash,
-    dot: to_dot,
-    nothing: to_nothing,
-}
-# add custom rules from command line
-for target, replace in rules:
-    substitutions[replace] = target
-log.debug(substitutions)
+    # last touch: remove multiple dashes
+    while "--" in text:
+        text = text.replace("--", "-")
 
-# apply all the rules
-for replace, targets in substitutions.items():
-    for target in targets:
-        log.debug(f'replacing {target} with {replace}')
-        text = text.replace(target, replace)
+    # prints the final string, ready to be processed by the shell
+    return text
 
-# last touch: remove multiple dashes
-while "--" in text:
-    text = text.replace("--", "-")
 
-# prints the final string, ready to be processed by the shell
-print(text)
+def main():
+    # get all command line parameters, excluding the first
+    # params = sys.argv[1:]
+    parser = parser.get_parser()
+    args = parser.parse_args()
+
+    params = args.tokens
+    log.debug(f'{params=}')
+    log.debug(f'{len(params)=}')
+    if not len(params):
+        log.fatal('missing parameters')
+        exit(1)
+
+    rules = args.replace
+    log.debug(f'{rules=}')
+
+    text = normalize(params, rules)
+    print(text)
+
+if __name__ == '__name__':
+    main()
