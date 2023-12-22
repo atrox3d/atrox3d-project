@@ -4,12 +4,7 @@ import logging
 from modules import logger
 from modules import parser
 
-DEBUG = False
-log = logger.get_logger(
-                    name=__name__,
-                    level=logging.INFO
-)
-
+log = logger.get_logger(name=__name__, level=logging.INFO)
 
 def normalize(params:list[str], rules:list[list[str, str]]):
     # join alla parameters with a dash and convert everything to lowercase
@@ -54,7 +49,6 @@ def normalize(params:list[str], rules:list[list[str, str]]):
     text = text.lstrip('-')
     text = text.rstrip('-')
 
-    # prints the final string, ready to be processed by the shell
     return text
 
 
