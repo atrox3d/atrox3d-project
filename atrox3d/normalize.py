@@ -1,8 +1,8 @@
 import sys
 import logging
 
-from modules import logger
-from modules import parser
+from .modules import logger
+from .modules import parser
 
 log = logger.get_logger(name=__name__, level=logging.INFO)
 
