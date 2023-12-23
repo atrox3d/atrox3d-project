@@ -8,7 +8,7 @@ def get_parser():
         description="test parser"
     )
 
-    parser.add_argument('tokens', nargs='*')
+    parser.add_argument('tokens', nargs='+')
 
     # expects argument
     # default = None
