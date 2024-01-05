@@ -14,6 +14,9 @@ def _copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
         raise FileNotFoundError(f'source file is missing: {src}')
     if dest.exists() and not overwrite:
         raise FileExistsError(f'dest file exists, overwrite is disabled: {dest}')
+    logger.info('COPY')
+    logger.info(f'{src=}')
+    logger.info(f'{dest=}')
     shutil.copy(src, dest)
 
 def copyfiles(gitignore=True, gitattributes=True) -> None:
