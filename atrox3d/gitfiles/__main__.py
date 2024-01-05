@@ -1,11 +1,11 @@
-from .gitfiles import copy
+from .gitfiles import copyfiles
 from ..helpers.logger import get_logger
 
 logger = get_logger(__name__)
 
 def main():
     try:
-        copy()
+        copyfiles()
     except FileNotFoundError as fnfe:
         print(fnfe)
     except FileExistsError as fee:
