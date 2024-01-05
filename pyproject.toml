@@ -8,3 +8,4 @@ version ="1.0.0"
 
 [project.scripts]
 normalize = "atrox3d.normalizer.__main__:main"
+gitfiles = "atrox3d.gitfiles.__main__:main"
