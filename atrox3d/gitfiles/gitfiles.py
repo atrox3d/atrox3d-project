@@ -8,34 +8,27 @@ from ..helpers.logger import get_logger
 
 logger = get_logger(__name__, 'DEBUG')
 
-workdir = os.getcwd()
-moduledir = os.path.dirname(__file__)
+def getpath(dirpath, filename) -> Path:
+    return Path(dirpath) / filename
 
-class GitFile(ABC):
-    @abstractmethod
-    def __init__(self, sourcefile, destfile, sourcedir=moduledir, destdir=workdir) -> None:
-        self.sourcedir = Path(sourcedir)
-        self.destdir = Path(destdir)
-        self.sourcefile = sourcefile
-        self.destfile = destfile
-        self.source = self.sourcedir / self.sourcefile
-        self.dest = self.destdir / self.destfile
+def copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
+    if not src.exists():
+        raise FileNotFoundError(f'source file is missing: {src}')
+    
+    if dest.exists() and not overwrite:
+        raise FileExistsError(f'dest file exists, overwrite is disabled: {dest}')
+
+    logger.debug(f'copy')
+    logger.debug(f'{src=}')
+    logger.debug(f'{dest=}')
+
+def copy(copy_gitignore=True, copy_gitattributes=True) -> None:
+    if copy_gitignore:
+        src = getpath(os.path.dirname(__file__), '.gitignore.txt')
+        dest = getpath(os.getcwd, '.gitignore')
+        copyfile(src, dest)
         
-        logger.debug(f'{self.sourcedir = }')
-        logger.debug(f'{self.destdir = }')
-        logger.debug(f'{self.source = }')
-        logger.debug(f'{self.dest = }')
-
-
-class GitIgnore(GitFile):
-    def __init__(self, source=moduledir, dest=workdir) -> None:
-        super().__init__('.gitignore', source, dest)
-
-
-class GitAttributes(GitFile):
-    def __init__(self, source=moduledir, dest=workdir) -> None:
-        super().__init__('.gitattributes', source, dest)
-
-
-def gitignore():
-        return GitIgnore()
+    if copy_gitattributes:
+        src = getpath(os.path.dirname(__file__), '.gitattributes.txt')
+        dest = getpath(os.getcwd, '.gitattributes')
+        copyfile(src, dest)
