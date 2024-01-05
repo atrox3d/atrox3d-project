@@ -1,7 +1,7 @@
 import sys
 import logging
 
-from ..modules import logger
+from ..helpers import logger
 from . import parser
 
 log = logger.get_logger(name=__name__, level=logging.INFO)
