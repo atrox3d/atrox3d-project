@@ -23,6 +23,7 @@ def copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
     logger.debug(f'copy')
     logger.debug(f'{src=}')
     logger.debug(f'{dest=}')
+    shutil.copy(src, dest)
 
 def copy(copy_gitignore=True, copy_gitattributes=True) -> None:
     if copy_gitignore:
@@ -32,5 +33,5 @@ def copy(copy_gitignore=True, copy_gitattributes=True) -> None:
 
     if copy_gitattributes:
         src = getpath(os.path.dirname(__file__), '.gitattributes.txt')
-        dest = getpath(os.getcwd, '.gitattributes')
+        dest = getpath(os.getcwd(), '.gitattributes')
         copyfile(src, dest)
