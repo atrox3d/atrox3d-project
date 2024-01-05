@@ -22,26 +22,3 @@ def get_parser():
                         )
 
     return parser
-
-
-# def parse():
-    # return parser.parse_args()
-
-def main():
-    parser: argparse.ArgumentParser = get_parser()
-
-    if not sys.argv[2:]:
-        # force params for testing if no params given
-        # params = ['19.', 'Strings:', 'Slicing']
-        params = '19. Strings: Slicing'.split()
-        sys.argv.extend(params)
-
-    args: argparse.Namespace = parser.parse_args()
-
-    # for x, y in args.__dict__.items():
-    #     print(x, y)
-    for k, v in vars(args).items():
-        print(f'{k} = {v}')
-
-if __name__ == '__main__':
-    main()

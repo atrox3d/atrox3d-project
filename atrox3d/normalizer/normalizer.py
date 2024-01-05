@@ -52,27 +52,3 @@ def normalize(text: str, rules: list[list[str]]=None):
     text = text.rstrip('-')
 
     return text
-
-
-def main():
-    # get all command line parameters, excluding the first
-    # params = sys.argv[1:]
-    parse = parser.get_parser()
-    args = parse.parse_args()
-
-    params = args.tokens
-    log.debug(f'{params=}')
-    log.debug(f'{len(params)=}')
-    if not len(params):
-        log.fatal('missing parameters')
-        exit(1)
-
-    rules = args.replace
-    log.debug(f'{rules=}')
-
-    params = " ".join(params)
-    text = normalize(params, rules)
-    print(text)
-
-if __name__ == '__main__':
-    main()
