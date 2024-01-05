@@ -6,9 +6,11 @@ from abc import ABC, abstractmethod
 
 from ..helpers.logger import get_logger
 
-logger = get_logger(__name__, 'DEBUG')
+logger = get_logger(__name__, 'INFO')
 
 def getpath(dirpath, filename) -> Path:
+    logger.debug(f'{dirpath=}')
+    logger.debug(f'{filename=}')
     return Path(dirpath) / filename
 
 def copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
@@ -25,9 +27,9 @@ def copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
 def copy(copy_gitignore=True, copy_gitattributes=True) -> None:
     if copy_gitignore:
         src = getpath(os.path.dirname(__file__), '.gitignore.txt')
-        dest = getpath(os.getcwd, '.gitignore')
+        dest = getpath(os.getcwd(), '.gitignore')
         copyfile(src, dest)
-        
+
     if copy_gitattributes:
         src = getpath(os.path.dirname(__file__), '.gitattributes.txt')
         dest = getpath(os.getcwd, '.gitattributes')
