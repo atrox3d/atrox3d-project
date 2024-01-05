@@ -10,13 +10,13 @@ SOURCE_DIR = os.path.dirname(__file__)
 DEST_DIR = os.getcwd()
 
 def _copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
+    logger.info('COPY')
+    logger.info(f'{src=!s}')
+    logger.info(f'{dest=!s}')
     if not src.exists():
         raise FileNotFoundError(f'source file is missing: {src}')
     if dest.exists() and not overwrite:
         raise FileExistsError(f'dest file exists, overwrite is disabled: {dest}')
-    logger.info('COPY')
-    logger.info(f'{src=}')
-    logger.info(f'{dest=}')
     shutil.copy(src, dest)
 
 def copyfiles(gitignore=True, gitattributes=True) -> None:
