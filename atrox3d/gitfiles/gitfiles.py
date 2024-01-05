@@ -13,12 +13,14 @@ moduledir = os.path.dirname(__file__)
 
 class GitFile(ABC):
     @abstractmethod
-    def __init__(self, filename, sourcedir=moduledir, destdir=workdir) -> None:
+    def __init__(self, sourcefile, destfile, sourcedir=moduledir, destdir=workdir) -> None:
         self.sourcedir = Path(sourcedir)
         self.destdir = Path(destdir)
-        self.filename = filename
-        self.source = self.sourcedir / self.filename
-        self.dest = self.destdir / self.filename
+        self.sourcefile = sourcefile
+        self.destfile = destfile
+        self.source = self.sourcedir / self.sourcefile
+        self.dest = self.destdir / self.destfile
+        
         logger.debug(f'{self.sourcedir = }')
         logger.debug(f'{self.destdir = }')
         logger.debug(f'{self.source = }')
@@ -28,6 +30,11 @@ class GitFile(ABC):
 class GitIgnore(GitFile):
     def __init__(self, source=moduledir, dest=workdir) -> None:
         super().__init__('.gitignore', source, dest)
+
+
+class GitAttributes(GitFile):
+    def __init__(self, source=moduledir, dest=workdir) -> None:
+        super().__init__('.gitattributes', source, dest)
 
 
 def gitignore():
