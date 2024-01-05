@@ -6,9 +6,6 @@ from ..helpers.logger import get_logger
 
 logger = get_logger(__name__, 'INFO')
 
-def buildpath(dirpath, filename) -> Path:
-    return Path(dirpath) / filename
-
 def copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
     if not src.exists():
         raise FileNotFoundError(f'source file is missing: {src}')
@@ -18,11 +15,11 @@ def copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
 
 def copy(copy_gitignore=True, copy_gitattributes=True) -> None:
     if copy_gitignore:
-        src = buildpath(os.path.dirname(__file__), '.gitignore.txt')
-        dest = buildpath(os.getcwd(), '.gitignore')
+        src = Path(os.path.dirname(__file__), '.gitignore.txt')
+        dest = Path(os.getcwd(), '.gitignore')
         copyfile(src, dest)
 
     if copy_gitattributes:
-        src = buildpath(os.path.dirname(__file__), '.gitattributes.txt')
-        dest = buildpath(os.getcwd(), '.gitattributes')
+        src = Path(os.path.dirname(__file__), '.gitattributes.txt')
+        dest = Path(os.getcwd(), '.gitattributes')
         copyfile(src, dest)
