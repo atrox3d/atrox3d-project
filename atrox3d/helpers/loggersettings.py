@@ -16,6 +16,16 @@ module = LogConfigItem('module', width=12)
 function = LogConfigItem('funcName', width=12)
 level = LogConfigItem('levelname', width=len('CRITICAL'))
 
+@dataclass
+class LogConfig:
+    items: list[LogConfigItem]
+    separator: str = ' | '
+
+    def __str__(self) -> str:
+        return self.separator.join(self.items)
+
+default_config = LogConfig(asctime, module)
+
 def main():
     for item in [asctime, module, level]:
         print(repr(item))
