@@ -35,11 +35,5 @@ def get_logger(name: str, level=logging.INFO,
 
 
 if __name__ == '__main__':
-    logger = get_logger(
-                    'test',
-                    date_width=0, 
-                    func_width=0,
-                    module_width=0
-                )
-
+    logger = get_logger( 'test', date_width=0, func_width=0, module_width=0 )
     logger.info('testing')
