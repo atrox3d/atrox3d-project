@@ -9,47 +9,27 @@ CONST.ASCTIME_WIDTH = len(CONST.DATE_FORMAT)
 CONST.MODULENAME_WIDTH = 12
 CONST.FUNCNAME_WIDTH = 12
 CONST.LEVELNAME_WIDTH = str(len("CRITICAL"))
-# CONST.LINE_FORMAT = (
-#             f"%(asctime)s | "
-#             f"%(module){CONST.MODULENAME_WIDTH}s.py | "
-#             f"%(funcName){CONST.FUNCNAME_WIDTH}s() | "
-#             f"%(levelname)-{CONST.LEVELNAME_WIDTH}s | "
-#             f"%(message)s"
-#     )
-
 
 def get_logger(name: str, level=logging.INFO,
-               asctime_width=CONST.ASCTIME_WIDTH,
-               modulename_width=CONST.ASCTIME_WIDTH,
-               funcname_width=CONST.FUNCNAME_WIDTH,
-               levelname_width=CONST.LEVELNAME_WIDTH,
-               lineformat=None,
+               date_width=CONST.ASCTIME_WIDTH,
+               module_width=CONST.ASCTIME_WIDTH,
+               func_width=CONST.FUNCNAME_WIDTH,
+               level_width=CONST.LEVELNAME_WIDTH,
+               custom_format=None,
                dateformat=CONST.DATE_FORMAT,
                ):
-    print(f'{lineformat=}')
-    print(f'{asctime_width=}')
-    print(f'{modulename_width=}')
-    print(f'{funcname_width=}')
-    print(f'{levelname_width=}')
-
-    if lineformat:
-        line_format = lineformat
+    if custom_format:
+        line_format = custom_format
     else:
-        line_format = f"%(asctime)s | " if asctime_width else ""
-        line_format +=f"%(module){modulename_width}s.py | " if modulename_width else ""
-        line_format +=f"%(funcName){funcname_width}s() | " if funcname_width else ""
-        line_format +=f"%(levelname)-{levelname_width}s | " if levelname_width else ""
+        line_format = f"%(asctime)s | " if date_width else ""
+        line_format +=f"%(module){module_width}s.py | " if module_width else ""
+        line_format +=f"%(funcName){func_width}s() | " if func_width else ""
+        line_format +=f"%(levelname)-{level_width}s | " if level_width else ""
         line_format +=f"%(message)s"
-    
-    print(f'{line_format=}')
-    date_format = dateformat or CONST.DATE_FORMAT
+        
+        date_format = dateformat
 
-    logging.basicConfig(
-        level=level,
-        format=line_format,
-        datefmt=date_format,
-        # stream=sys.stdout
-    )
+    logging.basicConfig(level=level, format=line_format, datefmt=date_format)
     logger = logging.getLogger(name)
     return logger
 
@@ -57,9 +37,9 @@ def get_logger(name: str, level=logging.INFO,
 if __name__ == '__main__':
     logger = get_logger(
                     'test',
-                    asctime_width=0, 
-                    funcname_width=0,
-                    modulename_width=0
+                    date_width=0, 
+                    func_width=0,
+                    module_width=0
                 )
 
     logger.info('testing')
