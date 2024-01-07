@@ -1,6 +1,5 @@
-from .loggerformat import LogFormat
+from .loggerformat import LoggerFormat
 from .logformatconfigitem import LogFormatConfigItem
-from .logformatconfigitem import Defaults
 from .logformatconfigitem import Constants
 
 class LoggerFormatBuilder:
@@ -33,7 +32,8 @@ class LoggerFormatBuilder:
     def build(self):
         if 'message' not in [item.name for item in self.items]:
             self.add_message()
-        return LogFormat(*self.items)
+        return LoggerFormat(*self.items)
 
-format = LoggerFormatBuilder().add_function().add_levelname().build()
-print(format)
+if __name__ == '__main__':
+    format = LoggerFormatBuilder().add_function().add_levelname().build()
+    print(format)
