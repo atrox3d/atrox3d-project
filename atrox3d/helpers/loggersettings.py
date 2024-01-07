@@ -1,11 +1,16 @@
 
 from .logformatconfigitem import LogFormatConfigItem, Defaults
+
 class LogFormat:
     def __init__(self, *items: list[LogFormatConfigItem], separator=' | ') -> None:
         self._items = list(items)
         for item in items:
             setattr(self, item.name, item)
         self._separator = separator
+    
+    def __iter__(self):
+        for item in self._items:
+            yield item
 
     def __str__(self) -> str:
         # return self._separator.join([str(item) for item in self._items])
@@ -21,7 +26,8 @@ default_config = LogFormat(
                         )
 
 def main():
-    for item in [Defaults.asctime, Defaults.module, Defaults.level, Defaults.message]:
+    # for item in [Defaults.asctime, Defaults.module, Defaults.level, Defaults.message]:
+    for item in default_config:
         print(f'{repr(item) =}')
         print(f'{item = !s}')
         print()
