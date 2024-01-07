@@ -15,7 +15,7 @@ class LogFormat:
     def __str__(self) -> str:
         # return self._separator.join([str(item) for item in self._items])
         # items = [str(item) for name, item in vars(self).items() if not name.startswith('_')]
-        return repr(self._separator.join(self._items))
+        return repr(self._separator.join(map(str, self)))
 
 default_config = LogFormat(
                         Defaults.asctime, 
