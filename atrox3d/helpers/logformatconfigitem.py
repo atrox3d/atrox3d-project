@@ -23,3 +23,11 @@ class Defaults:
     funcname = LogFormatConfigItem('funcName', width=Constants.FUNCNAME_WIDTH)
     level = LogFormatConfigItem('levelname', width=Constants.LEVEL_WIDTH)
     message = LogFormatConfigItem('message')
+
+    def __iter__(self):
+        for item in self._getlist():
+            yield item
+
+    def _getlist(self):
+        return [getattr(self, atr) for atr in dir(self) if not atr.startswith('_')]
+    
