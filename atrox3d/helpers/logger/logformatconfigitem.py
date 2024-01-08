@@ -4,23 +4,27 @@ from dataclasses import dataclass
 class LogFormatConfigItem:
     name: str
     width: int = None
-    format: str = None
-    enabled: bool = True    # remove
+    fieldtype: str = 's'
 
     def __str__(self) -> str:
         width =  self.width and str(self.width) or ''
-        return f'%({self.name}){width}s'
+        return f'%({self.name}){width}{self.fieldtype}'
 
 class Constants:
-    ASCTIME_FORMAT='%Y/%m/%d %H:%M:%S'
+    DATE_FORMAT='%Y/%m/%d %H:%M:%S'
+    ASCTIME = 'asctime'
+    ASCTIME_WIDTH = len(DATE_FORMAT)
+    MODULE = 'module'
     MODULE_WIDTH = 12
-    FUNCNAME_WIDTH = 12
+    FUNC = 'funcName'
+    FUNC_WIDTH = 12
+    LEVEL = 'levelname'
     LEVEL_WIDTH=len('CRITICAL')
 
 class Defaults:
-    asctime = LogFormatConfigItem('asctime', format=Constants.ASCTIME_FORMAT)
+    asctime = LogFormatConfigItem('asctime')
     module = LogFormatConfigItem('module', width=Constants.MODULE_WIDTH)
-    funcname = LogFormatConfigItem('funcName', width=Constants.FUNCNAME_WIDTH)
+    funcname = LogFormatConfigItem('funcName', width=Constants.FUNC_WIDTH)
     level = LogFormatConfigItem('levelname', width=Constants.LEVEL_WIDTH)
     message = LogFormatConfigItem('message')
 
