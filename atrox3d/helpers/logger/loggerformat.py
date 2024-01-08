@@ -4,19 +4,19 @@ from . import defaults as Defaults
 class LoggerFormat:
     def __init__(self, *items: list[LogFormatConfigItem], separator=' | ') -> None:
         self._items: list[LogFormatConfigItem] = list(items)
+        self._separator = separator
         
         # enable dot access
         for item in items:
             setattr(self, item.name, item)
             
-        self._separator = separator
     
-    def __getitem__(self, name) -> LogFormatConfigItem:
-            ''' simulate dict[access] '''
-            for item in self._items:
-                if item.name == name:
-                    return item
-            raise KeyError
+    # def __getitem__(self, name) -> LogFormatConfigItem:
+    #         ''' simulate dict[access] '''
+    #         for item in self._items:
+    #             if item.name == name:
+    #                 return item
+    #         raise KeyError
     
     def __iter__(self):
         for item in self._items:
