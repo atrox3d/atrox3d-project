@@ -10,7 +10,6 @@ class LoggerFormat:
         for item in items:
             setattr(self, item.name, item)
             
-    
     def __getitem__(self, name) -> LogFormatConfigItem:
             ''' simulate dict[access] '''
             for item in self._items:
@@ -23,7 +22,7 @@ class LoggerFormat:
             yield item
 
     def __str__(self) -> str:
-        return repr(self._separator.join(map(str, self)))
+        return self._separator.join(map(str, self))
 
 # default_config = LogFormat( Defaults.asctime, Defaults.module, Defaults.funcname, Defaults.level, Defaults.message ) 
 default_config = LoggerFormat(*Defaults.default_list)

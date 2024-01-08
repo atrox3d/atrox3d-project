@@ -7,4 +7,10 @@ funcname = LogFormatConfigItem('funcName', width=CONST.FUNC_WIDTH)
 level = LogFormatConfigItem('levelname', width=CONST.LEVEL_WIDTH)
 message = LogFormatConfigItem('message')
 
-default_list = [ globals()[n] for n in dir() if not n.startswith('_') and n[0].islower() ]
+default_list = [
+    asctime,
+    module,
+    funcname,
+    level,
+    message,
+]
