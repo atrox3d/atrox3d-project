@@ -11,12 +11,12 @@ class LoggerFormat:
             setattr(self, item.name, item)
             
     
-    # def __getitem__(self, name) -> LogFormatConfigItem:
-    #         ''' simulate dict[access] '''
-    #         for item in self._items:
-    #             if item.name == name:
-    #                 return item
-    #         raise KeyError
+    def __getitem__(self, name) -> LogFormatConfigItem:
+            ''' simulate dict[access] '''
+            for item in self._items:
+                if item.name == name:
+                    return item
+            raise KeyError
     
     def __iter__(self):
         for item in self._items:
