@@ -1,6 +1,6 @@
 from .loggerformat import LoggerFormat
 from .logformatconfigitem import LogFormatConfigItem
-from .logformatconfigitem import Constants
+from . import constants as CONST
 
 class LoggerFormatBuilder:
     def __init__(self) -> None:
@@ -17,13 +17,13 @@ class LoggerFormatBuilder:
     def add_asctime(self, width=None):
         return self.add_item('asctime', width)
 
-    def add_module(self, width=Constants.MODULE_WIDTH):
+    def add_module(self, width=CONST.MODULE_WIDTH):
         return self.add_item('module', width)
 
-    def add_function(self, width=Constants.FUNC_WIDTH):
+    def add_function(self, width=CONST.FUNC_WIDTH):
         return self.add_item('funcName', width)
 
-    def add_levelname(self, width=Constants.LEVEL_WIDTH):
+    def add_levelname(self, width=CONST.LEVEL_WIDTH):
         return self.add_item('levelname', width)
 
     def add_message(self, width=None):

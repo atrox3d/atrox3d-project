@@ -1,0 +1,9 @@
+DATE_FORMAT='%Y/%m/%d %H:%M:%S'
+ASCTIME = 'asctime'
+ASCTIME_WIDTH = len(DATE_FORMAT)
+MODULE = 'module'
+MODULE_WIDTH = 12
+FUNC = 'funcName'
+FUNC_WIDTH = 12
+LEVEL = 'levelname'
+LEVEL_WIDTH=len('CRITICAL')

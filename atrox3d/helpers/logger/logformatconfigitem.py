@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from . import constants as CONST
+
 @dataclass
 class LogFormatConfigItem:
     name: str
@@ -10,22 +12,11 @@ class LogFormatConfigItem:
         width =  self.width and str(self.width) or ''
         return f'%({self.name}){width}{self.fieldtype}'
 
-class Constants:
-    DATE_FORMAT='%Y/%m/%d %H:%M:%S'
-    ASCTIME = 'asctime'
-    ASCTIME_WIDTH = len(DATE_FORMAT)
-    MODULE = 'module'
-    MODULE_WIDTH = 12
-    FUNC = 'funcName'
-    FUNC_WIDTH = 12
-    LEVEL = 'levelname'
-    LEVEL_WIDTH=len('CRITICAL')
-
 class Defaults:
     asctime = LogFormatConfigItem('asctime')
-    module = LogFormatConfigItem('module', width=Constants.MODULE_WIDTH)
-    funcname = LogFormatConfigItem('funcName', width=Constants.FUNC_WIDTH)
-    level = LogFormatConfigItem('levelname', width=Constants.LEVEL_WIDTH)
+    module = LogFormatConfigItem('module', width=CONST.MODULE_WIDTH)
+    funcname = LogFormatConfigItem('funcName', width=CONST.FUNC_WIDTH)
+    level = LogFormatConfigItem('levelname', width=CONST.LEVEL_WIDTH)
     message = LogFormatConfigItem('message')
 
     def __iter__(self):
