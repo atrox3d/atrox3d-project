@@ -14,6 +14,11 @@ python -m venv venv
 
 # install in editable mode
 pip install -e .
+
+# fix vscode pylance cannot resolve package in editable mode
+# https://stackoverflow.com/a/76897706
+pip install -e . --config-settings editable_mode=strict
+
 # uninstall 
 pip uninstall snakesay
 
