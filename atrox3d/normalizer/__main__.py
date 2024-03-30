@@ -1,7 +1,7 @@
 import sys
 import logging
 
-from ..helpers import logger
+from ..helpers.logger import logger
 from . import parser
 from .normalizer import normalize
 

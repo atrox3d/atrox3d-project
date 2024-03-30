@@ -1,9 +1,8 @@
 import sys
 import logging
 
-from ..helpers import logger
+from ..helpers.logger import logger
 from . import parser
-
 log = logger.get_logger(name=__name__, level=logging.INFO)
 
 def normalize(text: str, rules: list[list[str]]=None):
