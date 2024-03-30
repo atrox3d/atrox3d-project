@@ -3,8 +3,8 @@ print(f'IMPORT | {__name__}')
 from pathlib import Path
 import re
 
-from modules.simplegit.repo import GitRepo
-from modules.simplegit.status import GitStatus
+from .repo import GitRepo
+from .status import GitStatus
 
 from . import git_command
 from .git_command import GitCommandException
