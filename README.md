@@ -17,7 +17,9 @@ pip install -e .
 
 # fix vscode pylance cannot resolve package in editable mode
 # https://stackoverflow.com/a/76897706
-pip install -e . --config-settings editable_mode=strict
+# https://stackoverflow.com/a/76301809
+pip install -e . --config-settings editable_mode=compat
+vscode: ctrl+shift+p, "Python: Restart language server"
 
 # uninstall 
 pip uninstall snakesay
