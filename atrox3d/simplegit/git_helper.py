@@ -12,13 +12,13 @@ from .git_command import GitCommandException
 class NotAGitRepo(Exception):
     pass
 
-def get_repo(name: str, path:str) -> GitRepo:
+def get_repo(path:str, name=None) -> GitRepo:
     '''
     factory method, creates GitRepo object from path
     '''
     if is_repo(path):
         remote = get_remote(path)
-        repo = GitRepo(name, path, remote)
+        repo = GitRepo(path, remote, name=name)
         return repo
     raise NotAGitRepo(f'path {path} is not a git repo')
 

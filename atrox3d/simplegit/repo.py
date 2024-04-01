@@ -8,13 +8,15 @@ from pathlib import Path
 
 @dataclass
 class GitRepo:
-    name: str
     path: str
     remote: str = None
+    name: str = None
 
 
     def __post_init__(self):
         self.path = str(self.path)
+        if self.name is None:
+            self.name = Path(self.path).stem
     
     def asdict(self):
         return(asdict(self))
