@@ -34,7 +34,7 @@ def run(command:str, path:str) -> subprocess.CompletedProcess:
     os.chdir(Path(path).resolve())
     args = shlex.split(command)
     try:
-        completed = subprocess.run(command, check=True, shell=False, capture_output=True, text=True)
+        completed = subprocess.run(args, check=True, shell=False, capture_output=True, text=True)
         return completed
     except subprocess.CalledProcessError as cpe:
         raise GitCommandException(**vars(cpe), path=path)
