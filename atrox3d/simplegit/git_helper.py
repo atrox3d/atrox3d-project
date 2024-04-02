@@ -88,3 +88,14 @@ def add(path, *files, all=False):
         command += ' '.join(files)
     result = git_command.run(command, path)
     return result
+
+def commit(path, comment, *files, all=False):
+    command =  'git commit '
+    if all:
+        command += '-am'
+    else:
+        command += '-m '
+    command +=f'\'{comment}\''
+    result = git_command.run(command, path)
+    return result
+
