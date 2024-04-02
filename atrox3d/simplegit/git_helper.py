@@ -69,6 +69,9 @@ def get_status(repo:GitRepo) -> GitStatus:
                 status.added.append(filename)
             case 'M', filename:
                 status.modified.append(filename)
+            case 'AM', filename:
+                status.modified.append(filename)
+                status.added.append(filename)
             case 'D', filename:
                 status.deleted.append(filename)
             case '??', filename:
@@ -77,3 +80,11 @@ def get_status(repo:GitRepo) -> GitStatus:
                 raise ValueError(f'unknown status {line!r}')
     return status
 
+def add(path, *files, all=False):
+    command =  'git add '
+    if all:
+        command += '.'
+    else:
+        command += ' '.join(files)
+    result = git_command.run(command, path)
+    return result
