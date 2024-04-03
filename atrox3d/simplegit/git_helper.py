@@ -103,17 +103,20 @@ def _format_stream(stream, prefix):
         [f'{prefix} | {line}' for line in stream.rstrip().split('\n')]
     )
 
+def _run(command, path):
+    try:
+        result = git_command.run(command, path)
+    except GitCommandException as gce:
+        raise GitException(gce)
+    return _format_stream(result.stdout, command) + '\n' + _format_stream(result.stderr, command)
+
 def add(path, *files, all=False):
     command =  'git add '
     if all:
         command += '.'
     else:
         command += ' '.join(files)
-    try:
-        result = git_command.run(command, path)
-    except GitCommandException as gce:
-        raise GitException(gce)
-    return _format_stream(result.stdout, command)
+    return _run(command, path)
 
 def commit(path, comment, *files, all=False):
     command =  'git commit '
@@ -122,24 +125,12 @@ def commit(path, comment, *files, all=False):
     else:
         command += '-m '
     command +=f'\'{comment}\''
-    try:
-        result = git_command.run(command, path)
-    except GitCommandException as gce:
-        raise GitException(gce)
-    return _format_stream(result.stdout, command)
+    return _run(command, path)
 
 def push(path):
     command = 'git push'
-    try:
-        result = git_command.run(command, path)
-    except GitCommandException as gce:
-        raise GitException(gce)
-    return _format_stream(result.stdout, command)
+    return _run(command, path)
 
 def pull(path):
     command = 'git pull'
-    try:
-        result = git_command.run(command, path)
-    except GitCommandException as gce:
-        raise GitException(gce)
-    return _format_stream(result.stdout, command)
+    return _run(command, path)
