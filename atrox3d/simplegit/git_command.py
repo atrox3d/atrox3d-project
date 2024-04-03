@@ -12,7 +12,7 @@ class GitCommandException(subprocess.CalledProcessError):
     
     def __str__(self) -> str:
         out = []
-        out.append(f'EXCEPTION running command {self.cmd}')
+        out.append(f'{type(self).__name__} running command {self.cmd}')
         out.append(f'PATH    : {self.path}')
         out.append(f'CMD     : {self.cmd}')
         # out.append(f'ARGS    : {self.args}')
