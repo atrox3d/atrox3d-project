@@ -32,6 +32,7 @@ class GitStatus:
     added: list = field(default_factory=list)
     deleted: list = field(default_factory=list)
     untracked: list = field(default_factory=list)
+    unstaged: list = field(default_factory=list)
     dirty: bool = False
     push: bool = False
     pull: bool = False

@@ -72,6 +72,9 @@ def get_status(repo:GitRepo) -> GitStatus:
             case 'AM', filename:
                 status.modified.append(filename)
                 status.added.append(filename)
+            case 'MM', filename:
+                status.modified.append(filename)
+                status.unstaged.append(filename)
             case 'D', filename:
                 status.deleted.append(filename)
             case '??', filename:
@@ -80,6 +83,11 @@ def get_status(repo:GitRepo) -> GitStatus:
                 raise ValueError(f'unknown status {line!r}')
     return status
 
+def _format_stream(stream, prefix):
+    return '\n'.join(
+        [f'{prefix} | {line}' for line in stream.rstrip().split('\n')]
+    )
+
 def add(path, *files, all=False):
     command =  'git add '
     if all:
@@ -87,15 +95,24 @@ def add(path, *files, all=False):
     else:
         command += ' '.join(files)
     result = git_command.run(command, path)
-    return result
+    return _format_stream(result.stdout, command)
 
 def commit(path, comment, *files, all=False):
     command =  'git commit '
     if all:
-        command += '-am'
+        command += '-am '
     else:
         command += '-m '
     command +=f'\'{comment}\''
     result = git_command.run(command, path)
-    return result
+    return _format_stream(result.stdout, command)
 
+def push(path):
+    command = 'git push'
+    result = git_command.run(command, path)
+    return _format_stream(result.stdout, command)
+
+def pull(path):
+    command = 'git pull'
+    result = git_command.run(command, path)
+    return _format_stream(result.stdout, command)
