@@ -89,10 +89,13 @@ def get_status(repo:GitRepo) -> GitStatus:
                 status.unstaged.append(filename)
             case 'D', filename:
                 status.deleted.append(filename)
+            case 'R', filename, '->', newname:
+                status.renamed.append(filename)
+                status.added.append(newname)
             case '??', filename:
                 status.untracked.append(filename)
             case _:
-                raise ValueError(f'unknown status {line!r}')
+                raise ValueError(f'unknown status {line.split()!r}')
     return status
 
 def _format_stream(stream, prefix):
