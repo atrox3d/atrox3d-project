@@ -9,6 +9,10 @@ from .status import GitStatus
 from . import git_command
 from .git_command import GitCommandException
 
+class GitException(GitCommandException):
+    def __init__(self, gce: GitCommandException):
+        super().__init__(**vars(gce))
+
 class NotAGitRepo(Exception):
     pass
 
@@ -33,7 +37,11 @@ def get_remote(path:str) -> str:
     '''
     extracts remote from git remote command
     '''
-    result = git_command.run('git remote -v', path)
+    try:
+        result = git_command.run('git remote -v', path)
+    except GitCommandException as gce:
+        raise GitException(gce)
+
     if result.stdout:
         name, url, mode = result.stdout.split('\n')[0].split()
         return url
@@ -49,7 +57,11 @@ def get_status(repo:GitRepo) -> GitStatus:
     M modules/git_helper.py
     '''
     command = 'git status --branch --porcelain'
-    result = git_command.run(command, repo.path)
+
+    try:
+        result = git_command.run(command, repo.path)
+    except GitCommandException as gce:
+        raise GitException(gce)
 
     branchstatus, *lines =  result.stdout.split('\n')
     branch_pattern = r'^## ([^ .]+)(\.{3}(\S+))*( \[{0,1}(\S+) (\d+)\]{0,1})*$'
@@ -94,7 +106,10 @@ def add(path, *files, all=False):
         command += '.'
     else:
         command += ' '.join(files)
-    result = git_command.run(command, path)
+    try:
+        result = git_command.run(command, path)
+    except GitCommandException as gce:
+        raise GitException(gce)
     return _format_stream(result.stdout, command)
 
 def commit(path, comment, *files, all=False):
@@ -104,15 +119,24 @@ def commit(path, comment, *files, all=False):
     else:
         command += '-m '
     command +=f'\'{comment}\''
-    result = git_command.run(command, path)
+    try:
+        result = git_command.run(command, path)
+    except GitCommandException as gce:
+        raise GitException(gce)
     return _format_stream(result.stdout, command)
 
 def push(path):
     command = 'git push'
-    result = git_command.run(command, path)
+    try:
+        result = git_command.run(command, path)
+    except GitCommandException as gce:
+        raise GitException(gce)
     return _format_stream(result.stdout, command)
 
 def pull(path):
     command = 'git pull'
-    result = git_command.run(command, path)
+    try:
+        result = git_command.run(command, path)
+    except GitCommandException as gce:
+        raise GitException(gce)
     return _format_stream(result.stdout, command)

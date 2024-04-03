@@ -15,7 +15,7 @@ class GitCommandException(subprocess.CalledProcessError):
         out.append(f'EXCEPTION running command {self.cmd}')
         out.append(f'PATH    : {self.path}')
         out.append(f'CMD     : {self.cmd}')
-        out.append(f'ARGS    : {self.args}')
+        # out.append(f'ARGS    : {self.args}')
         out.append(f'EXITCODE: {self.returncode}')
         out.append(f'STDOUT  : {self.stdout}')
         out.append(f'STDERR  : {self.stderr}')
