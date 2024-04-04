@@ -134,3 +134,14 @@ def push(path):
 def pull(path):
     command = 'git pull'
     return _run(command, path)
+
+def clone(remote: str, path: str=None, dest_path: str=None):
+    command = f'git clone {remote} '
+    
+    if dest_path is not None:
+        # shlex.split breaks on windows paths
+        # https://stackoverflow.com/a/63534016
+        command += str(Path(dest_path).as_posix())
+
+    path = '.' if path is None else path
+    return _run(command, path)

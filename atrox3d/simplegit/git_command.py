@@ -32,6 +32,9 @@ def pushd(fn):
 @pushd
 def run(command:str, path:str) -> subprocess.CompletedProcess:
     os.chdir(Path(path).resolve())
+    # shlex.split breaks on windows paths
+    # use Path(path).as_posix()
+    # https://stackoverflow.com/a/63534016
     args = shlex.split(command)
     try:
         completed = subprocess.run(args, check=True, shell=False, capture_output=True, text=True)
