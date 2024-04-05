@@ -77,6 +77,7 @@ def get_status(repo:GitRepo) -> GitStatus:
     for line in [line for line in lines if len(line)]:
         status.dirty = True
         match line.split():
+            # TODO: fix parsing
             case 'A', filename:
                 status.added.append(filename)
             case 'M', filename:
@@ -87,6 +88,9 @@ def get_status(repo:GitRepo) -> GitStatus:
             case 'MM', filename:
                 status.modified.append(filename)
                 status.unstaged.append(filename)
+            case 'RM', filename, '->', newname:
+                status.renamed.append(filename)
+                status.added.append(newname)
             case 'D', filename:
                 status.deleted.append(filename)
             case 'R', filename, '->', newname:
