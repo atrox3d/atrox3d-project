@@ -55,6 +55,10 @@ def get_status(repo:GitRepo) -> GitStatus:
     git status --branch --porcelain
     ## master...origin/master [ahead 4]
     M modules/git_helper.py
+
+    https://www.baeldung.com/linux/git-script-check-clean-directory#2-status-flags
+    the first character shows the index status while the second shows 
+    the workspace status
     '''
     command = 'git status --branch --porcelain'
 
