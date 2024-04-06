@@ -78,7 +78,10 @@ def get_status(repo:GitRepo) -> GitStatus:
     elif status.position == 'behind':
         status.pull = True
     
+    status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
     for line in [line for line in lines if len(line)]:
+        res = re.match(status_pattern, line)
+        print(f'{res.groupdict()}')
         status.dirty = True
         match line.split():
             # TODO: fix parsing
