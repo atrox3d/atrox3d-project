@@ -68,10 +68,12 @@ def get_status(repo:GitRepo) -> GitStatus:
         raise GitException(gce)
 
     branchstatus, *lines =  result.stdout.split('\n')
-    branch_pattern = r'^## ([^ .]+)(\.{3}(\S+))*( \[{0,1}(\S+) (\d+)\]{0,1})*$'
+    branch_pattern = r'^## (?P<branch>[^ .]+)(\.{3}(?P<remote>\S+))*( \[{0,1}(?P<position>\S+) (?P<commits>\d+)\]{0,1})*$'
     res = re.match(branch_pattern, branchstatus).groups()
     status = GitStatus()
     status.branch, _, status.remote, _, status.position, status.commits = res
+    res = re.match(branch_pattern, branchstatus)
+    print(f'{res.groupdict()}')
 
     if status.position == 'ahead':
         status.push = True
