@@ -32,8 +32,22 @@ class GitStatus:
     added: list = field(default_factory=list)
     deleted: list = field(default_factory=list)
     untracked: list = field(default_factory=list)
-    unstaged: list = field(default_factory=list)
+    # unstaged: list = field(default_factory=list)
     renamed: list = field(default_factory=list)
     dirty: bool = False
-    push: bool = False
-    pull: bool = False
+    need_push: bool = False
+    need_pull: bool = False
+
+    def total(self):
+        return sum(map(len, [
+            self.modified, self.added, self.deleted,
+            self.untracked, self.renamed
+        ]))
+        # return sum([len(getattr(self, l)) for l in vars(self) 
+                    # if isinstance(getattr(self, l), list)])
+    
+# if __name__ == '__main__':
+    # status = GitStatus()
+    # status.added.append(1)
+    # status.deleted.append(1)
+    # print(status.total())

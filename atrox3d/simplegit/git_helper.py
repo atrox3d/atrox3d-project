@@ -68,47 +68,73 @@ def get_status(repo:GitRepo) -> GitStatus:
         raise GitException(gce)
 
     branchstatus, *lines =  result.stdout.split('\n')
-    branch_pattern = r'^## (?P<branch>[^ .]+)(\.{3}(?P<remote>\S+))*( \[{0,1}(?P<position>\S+) (?P<commits>\d+)\]{0,1})*$'
-    res = re.match(branch_pattern, branchstatus).groups()
+    branch_pattern = r'^## (?P<branch>[^ .]+)' \
+                     r'(\.{3}(?P<remote>\S+))' \
+                     r'*( \[{0,1}(?P<position>\S+) (?P<commits>\d+)\]{0,1})*$'
+    
+    # res = re.match(branch_pattern, branchstatus).groups()
+    # print(f'{res = }')
     status = GitStatus()
-    status.branch, _, status.remote, _, status.position, status.commits = res
+    # status.branch, _, status.remote, _, status.position, status.commits = res
     res = re.match(branch_pattern, branchstatus)
     print(f'{res.groupdict()}')
+    status.branch, status.remote, status.position, status.commits = res.groupdict().values()
 
-    if status.position == 'ahead':
-        status.push = True
-    elif status.position == 'behind':
-        status.pull = True
+    if status.position == 'ahead': status.need_push = True
+    if status.position == 'behind': status.need_pull = True
     
-    status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
+    status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])' \
+                     r'\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
     for line in [line for line in lines if len(line)]:
         res = re.match(status_pattern, line)
         print(f'{res.groupdict()}')
+        index, workspace, filename, newname = res.groupdict().values()
+        
         status.dirty = True
-        match line.split():
-            # TODO: fix parsing
-            case 'A', filename:
-                status.added.append(filename)
-            case 'M', filename:
-                status.modified.append(filename)
-            case 'AM', filename:
-                status.modified.append(filename)
-                status.added.append(filename)
-            case 'MM', filename:
-                status.modified.append(filename)
-                status.unstaged.append(filename)
-            case 'RM', filename, '->', newname:
-                status.renamed.append(filename)
-                status.added.append(newname)
-            case 'D', filename:
-                status.deleted.append(filename)
-            case 'R', filename, '->', newname:
-                status.renamed.append(filename)
-                status.added.append(newname)
-            case '??', filename:
-                status.untracked.append(filename)
-            case _:
-                raise ValueError(f'unknown status {line.split()!r}')
+
+        if index + workspace == '??':
+            status.untracked.append(filename)
+            continue
+        for flag in index, workspace:
+            match flag:
+                case ' ':
+                    pass
+                case 'A':
+                    status.added.append(filename)
+                case 'M':
+                    status.modified.append(filename)
+                case 'D':
+                    status.deleted.append(filename)
+                case 'R':
+                    status.renamed.append(filename)
+                    status.added.append(newname)
+                case _:
+                    raise ValueError(f'unknown {flag=!r} in status {line.split()!r}')
+
+        # match line.split():
+        #     # TODO: fix parsing
+        #     case 'A', filename:
+        #         status.added.append(filename)
+        #     case 'M', filename:
+        #         status.modified.append(filename)
+        #     case 'AM', filename:
+        #         status.modified.append(filename)
+        #         status.added.append(filename)
+        #     case 'MM', filename:
+        #         status.modified.append(filename)
+        #         status.unstaged.append(filename)
+        #     case 'RM', filename, '->', newname:
+        #         status.renamed.append(filename)
+        #         status.added.append(newname)
+        #     case 'D', filename:
+        #         status.deleted.append(filename)
+        #     case 'R', filename, '->', newname:
+        #         status.renamed.append(filename)
+        #         status.added.append(newname)
+        #     case '??', filename:
+        #         status.untracked.append(filename)
+        #     case _:
+        #         raise ValueError(f'unknown status {line.split()!r}')
     return status
 
 def _format_stream(stream, prefix):
