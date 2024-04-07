@@ -108,11 +108,13 @@ def get_status(repo:GitRepo) -> GitStatus:
     return status
 
 def _format_stream(stream, prefix):
+    ''' helper: returns formatted stream with prefix '''
     return '\n'.join(
         [f'{prefix} | {line}' for line in stream.rstrip().split('\n')]
     )
 
 def _run(command, path):
+    ''' helper: runs command and returns formatted stdout+stderr '''
     try:
         result = git_command.run(command, path)
     except GitCommandException as gce:
@@ -121,19 +123,13 @@ def _run(command, path):
 
 def add(path, *files, all=False):
     command =  'git add '
-    if all:
-        command += '.'
-    else:
-        command += ' '.join(files)
+    command += '.' if all else ' '.join(files)
     return _run(command, path)
 
-def commit(path, comment, *files, all=False):
+def commit(path, comment, add_all=False):
     command =  'git commit '
-    if all:
-        command += '-am '
-    else:
-        command += '-m '
-    command +=f'\'{comment}\''
+    command += '-am ' if add_all else '-m'
+    command += f'\'{comment}\''
     return _run(command, path)
 
 def push(path):
@@ -144,12 +140,9 @@ def pull(path):
     command = 'git pull'
     return _run(command, path)
 
-def clone(remote: str, dest_path: str, path: str=None):
+def clone(remote: str, dest_path: str, path: str='.'):
     command = f'git clone {remote} '
-    
     # shlex.split breaks on windows paths
     # https://stackoverflow.com/a/63534016
     command += str(Path(dest_path).as_posix())
-
-    path = '.' if path is None else path
     return _run(command, path)
