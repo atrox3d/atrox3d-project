@@ -41,36 +41,40 @@ def scan(*paths: str, remote :bool=None, recurse: bool=True, absolute :bool=Fals
             except git.NotAGitRepo:
                 pass
 
+def collect(*paths: str, recurse: bool, absolute=False) -> dict:
+    # ws = VsCodeWorkspace(workspace_path)
+    repos = {}
+    for repo in scan(*paths, recurse=recurse, absolute=absolute, remote=True):
+        print(f'ADDING | {repo.path}')
+        repos[repo.path] = repo.remote
+    return repos
+
 if __name__ == '__main__':
-    repos = scan(
+    # repos = scan(
+    #                 # r'..\..\..\zio',
+    #                 # r'c:\users\nigga\code\php',
+    #                 # r'c:\users\nigga\code\bash',
+    #                 r'..\..\..\bash\..\python',
+    #                 # r'../../../bash/../python',
+    #                 remote=None,
+    #                 # recurse=False,
+    #                 # absolute=True,
+    #             )
+    # for repo in repos:
+    #     print()
+    #     print(repo.path)
+    #     print(repo.remote)
+    repos = collect(
                     # r'..\..\..\zio',
                     # r'c:\users\nigga\code\php',
                     # r'c:\users\nigga\code\bash',
                     r'..\..\..\bash\..\python',
                     # r'../../../bash/../python',
-                    remote=None,
-                    # recurse=False,
+                    recurse=True,
                     # absolute=True,
-                )
-    for repo in repos:
-        print()
-        print(repo.path)
-        print(repo.remote)
-    # print(repos)
-    # print(list(repos.repos))
+    )
+    print(repos)
     exit()
-
-# def get_repos(path: str, recurse: bool) -> dict:
-#     # ws = VsCodeWorkspace(workspace_path)
-#     repos = {}
-#     for repo in get_gitrepos(ws, recurse=recurse):
-#         if repo.remote is not None:
-#             print(f'ADDING | {repo.path}')
-#             repos[repo.path] = repo.remote
-#         else:
-#             print(f'NO REMOTE | skipping | {repo.path}')
-    
-#     return repos
 
 def save_repos(repos: dict, json_path: str):
     print(f'SAVING  | {json_path}')
