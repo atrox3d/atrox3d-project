@@ -1,4 +1,5 @@
 print(f'IMPORT | {__name__}')
-print(f'{__name__} from . import git_helper as git')
-from . import git_helper as git
+print(f'IMPORT | {__name__} | from . import git')
+from . import git
+print(f'IMPORT | {__name__} | from . import repos')
 from . import repos

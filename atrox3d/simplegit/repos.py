@@ -5,7 +5,7 @@ from typing import Generator
 # from common import get_gitrepos
 # from vscode_workspace import VsCodeWorkspace
 # import options
-from atrox3d.simplegit import git
+from . import git
 
 def scan(*paths: str, remote :bool=None, recurse: bool=True, absolute :bool=False) -> Generator[git.GitRepo, None, None]:
     '''
