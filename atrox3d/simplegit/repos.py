@@ -60,20 +60,22 @@ def load(json_path: str):
         repos = json.load(fp)
     return repos
 
-def backup_repos(*paths: str, json_path:str, recurse: bool, absolute=False):
+def backup(*paths: str, json_path:str, recurse: bool, absolute=False):
     clone = collect(*paths, recurse=recurse, absolute=absolute)
     save(clone, json_path)
 
 
-def restore_repos(json_path:str, base_path: str, dryrun=True, breakonerrors=True):
+def restore(json_path:str, base_path: str, dryrun=True, breakonerrors=True):
     clone = load(json_path)
 
     for path, remote in clone.items():
         dest_path = (Path(base_path) / path).resolve()
+        if dest_path.exists():
+            print(f'SKIPPING | {dest_path!r} already exists')
         if dryrun:
-            print(f'DRYRUN | {dest_path}')
+            print(f'DRYRUN | CLONE TO PATH | {dest_path!r}')
         else:
-            print(f'CLONE TO PATH | {dest_path}')
+            print(f'CLONE TO PATH | {dest_path!r}')
             try:
                 output = git.clone(remote, dest_path)
                 print(output)
@@ -84,15 +86,13 @@ def restore_repos(json_path:str, base_path: str, dryrun=True, breakonerrors=True
 
 
 if __name__ == '__main__':
-    backup_repos(
-                    # r'..\..\..\zio',
-                    # r'c:\users\nigga\code\php',
-                    # r'c:\users\nigga\code\bash',
-                    r'..\..\..\bash\..\python',
-                    # r'../../../bash/../python',
-                    json_path=r'C:\Users\nigga\code\vscode\repos.json',
+    JSON = r'C:\Users\nigga\code\vscode\repos.json'
+
+    backup(
+                    # r'..\..\..\bash\..\python',
+                    r'..\..\..\zio',
+                    json_path=JSON,
                     recurse=True,
-                    # absolute=True,
     )
 
-
+    restore(JSON, r'd:')
