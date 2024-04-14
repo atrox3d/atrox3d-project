@@ -1,30 +1,61 @@
 import json
 from pathlib import Path
+from typing import Generator
 
 # from common import get_gitrepos
 # from vscode_workspace import VsCodeWorkspace
 # import options
 from atrox3d.simplegit import git
 
-def scan(*paths: str, recurse: bool, absolute=False) -> dict:
+def scan(*paths: str, remote :bool=None, recurse: bool=True, absolute :bool=False) -> Generator[git.GitRepo, None, None]:
     '''
     returns a generator of GitRepo objects inside the root folder
     - if recurse==True, searches recursively every git repo inside each workspace item
     - if absolute==True, the paths are converted to absolute paths
     '''
-    for name, path in ws.get_configtuples():
+    def filter_repo(repo:git.GitRepo, remote) -> git.GitRepo | None:
+        if remote is None:
+            return repo
+        elif remote and repo.remote:
+            return repo
+        elif not remote and repo.remote is None:
+            return repo
+        else:
+            return False
+
+    for path in paths:
         path = Path(path).resolve() if absolute else Path(path)
+        if not path.exists():
+            raise FileNotFoundError(path)
+        
         if recurse:
             for repo_git_folder in path.glob('**/.git/'):
-                yield git.get_repo(repo_git_folder.parent, name=name)
+                repo = git.get_repo(repo_git_folder.parent)
+                if filter_repo(repo, remote) is not False:
+                    yield repo
         else:
             try:
-                yield git.get_repo(path, name=name)
+                repo = git.get_repo(path)
+                if filter_repo(repo, remote) is not False:
+                    yield repo
             except git.NotAGitRepo:
                 pass
 
 if __name__ == '__main__':
-    # repos = Repos(r'c:\users\nigga\code')
+    repos = scan(
+                    # r'..\..\..\zio',
+                    # r'c:\users\nigga\code\php',
+                    # r'c:\users\nigga\code\bash',
+                    r'..\..\..\bash\..\python',
+                    # r'../../../bash/../python',
+                    remote=None,
+                    # recurse=False,
+                    # absolute=True,
+                )
+    for repo in repos:
+        print()
+        print(repo.path)
+        print(repo.remote)
     # print(repos)
     # print(list(repos.repos))
     exit()
