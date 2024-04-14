@@ -49,51 +49,24 @@ def collect(*paths: str, recurse: bool, absolute=False) -> dict:
         repos[repo.path] = repo.remote
     return repos
 
-if __name__ == '__main__':
-    # repos = scan(
-    #                 # r'..\..\..\zio',
-    #                 # r'c:\users\nigga\code\php',
-    #                 # r'c:\users\nigga\code\bash',
-    #                 r'..\..\..\bash\..\python',
-    #                 # r'../../../bash/../python',
-    #                 remote=None,
-    #                 # recurse=False,
-    #                 # absolute=True,
-    #             )
-    # for repo in repos:
-    #     print()
-    #     print(repo.path)
-    #     print(repo.remote)
-    repos = collect(
-                    # r'..\..\..\zio',
-                    # r'c:\users\nigga\code\php',
-                    # r'c:\users\nigga\code\bash',
-                    r'..\..\..\bash\..\python',
-                    # r'../../../bash/../python',
-                    recurse=True,
-                    # absolute=True,
-    )
-    print(repos)
-    exit()
-
-def save_repos(repos: dict, json_path: str):
+def save(repos: dict, json_path: str):
     print(f'SAVING  | {json_path}')
     with open(json_path, 'w') as fp:
         json.dump(repos, fp, indent=2)
 
-def load_repos(json_path: str):
+def load(json_path: str):
     print(f'LOADING | {json_path}')
     with open(json_path) as fp:
         repos = json.load(fp)
     return repos
 
-def backup_repos(workspace_path: str, json_path:str, recurse: bool):
-    clone = get_repos(workspace_path, recurse)
-    save_repos(clone, json_path)
+def backup_repos(*paths: str, json_path:str, recurse: bool, absolute=False):
+    clone = collect(*paths, recurse=recurse, absolute=absolute)
+    save(clone, json_path)
 
 
 def restore_repos(json_path:str, base_path: str, dryrun=True, breakonerrors=True):
-    clone = load_repos(json_path)
+    clone = load(json_path)
 
     for path, remote in clone.items():
         dest_path = (Path(base_path) / path).resolve()
@@ -109,21 +82,17 @@ def restore_repos(json_path:str, base_path: str, dryrun=True, breakonerrors=True
                 if breakonerrors:
                     return
 
-# def main():
-#     import argparse
-#     parser = options.get_clone_parser()
-#     args: argparse.Namespace = parser.parse_args()
 
-#     for k, v in vars(args).items():
-#         print(f'PARAM  | {k} = {v}')
-
-#     if args.command == 'backup':
-#         backup_repos(args.workspace, args.json, args.recurse)
-#     elif args.command == 'restore':
-#         restore_repos(args.json, args.destpath, args.dryrun, args.breakonerrors)
-#     else:
-#         # this should never run, because argparse takes care of it
-#         raise ValueError(f'uknown subcommand {args.command!r}')
-
+if __name__ == '__main__':
+    backup_repos(
+                    # r'..\..\..\zio',
+                    # r'c:\users\nigga\code\php',
+                    # r'c:\users\nigga\code\bash',
+                    r'..\..\..\bash\..\python',
+                    # r'../../../bash/../python',
+                    json_path=r'C:\Users\nigga\code\vscode\repos.json',
+                    recurse=True,
+                    # absolute=True,
+    )
 
 
