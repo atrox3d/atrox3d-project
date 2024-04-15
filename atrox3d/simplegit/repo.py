@@ -18,10 +18,13 @@ class GitRepo:
         if self.name is None:
             self.name = Path(self.path).stem
     
-    def asdict(self):
+    def asdict(self) -> dict:
         return(asdict(self))
     
-    def get_path(self):
+    def get_path(self) -> Path:
+        '''
+        converts self.path string to Path
+        '''
         return Path(self.path)
     
     # def get_status(self) -> GitStatus:
