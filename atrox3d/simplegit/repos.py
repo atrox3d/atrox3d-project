@@ -30,7 +30,7 @@ def scan(*paths: str, remote :bool=None, recurse: bool=True, absolute :bool=Fals
         
         if recurse:
             for repo_git_folder in path.glob('**/.git/'):
-                repo = git.get_repo(repo_git_folder.parent)
+                repo = git.get_repo(repo_git_folder.parent.as_posix())
                 if filter_repo(repo, remote) is not False:
                     yield repo
         else:
