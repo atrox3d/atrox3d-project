@@ -25,7 +25,7 @@ class GitStatus:
     As a result, it's easier and safer to use it within a script.
     '''
     branch: str = None
-    remote: str = None
+    remote_branch: str = None
     position: str = None
     commits: str = None
     modified: list = field(default_factory=list)
