@@ -129,19 +129,19 @@ def get_status(repo:GitRepo) -> GitStatus:
                 case 'D':
                     status.deleted.append(filename)
                 case 'R':
-                    status.renamed.append(filename)
-                    status.added.append(newname)
+                    # status.deleted.append(filename)
+                    status.renamed.append((filename, newname))
                 case _:
                     raise ValueError(f'unknown {flag=!r} in status {line.split()!r}')
     return status
 
-def _format_stream(stream, prefix):
+def _format_stream(stream, prefix) -> str:
     ''' helper: returns formatted stream with prefix '''
     return '\n'.join(
         [f'{prefix} | {line}' for line in stream.rstrip().split('\n')]
     )
 
-def _run(command, path):
+def _run(command, path) -> str:
     ''' helper: runs command and returns formatted stdout+stderr '''
     try:
         result = git_command.run(command, path)
@@ -149,26 +149,35 @@ def _run(command, path):
         raise GitException(gce)
     return _format_stream(result.stdout, command) + '\n' + _format_stream(result.stderr, command)
 
-def add(path, *files, all=False):
+def add(path_or_repo:str|GitRepo, *files:str, all:bool=False) -> str:
     command =  'git add '
     command += '.' if all else ' '.join(files)
+    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     return _run(command, path)
 
-def commit(path, comment, add_all=False):
+def commit(path_or_repo:str|GitRepo, comment:str, add_all:bool=False) -> str:
     command =  'git commit '
     command += '-am ' if add_all else '-m'
     command += f'\'{comment}\''
+    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     return _run(command, path)
 
-def push(path):
+def fetch(path_or_repo:str|GitRepo) -> str:
+    command = 'git fetch'
+    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
+    return _run(command, path)
+
+def push(path_or_repo:str|GitRepo) -> str:
     command = 'git push'
+    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     return _run(command, path)
 
-def pull(path):
+def pull(path_or_repo:str|GitRepo) -> str:
     command = 'git pull'
+    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     return _run(command, path)
 
-def clone(remote: str, dest_path: str, path: str='.'):
+def clone(remote: str, dest_path: str, path: str='.') -> str:
     command = f'git clone {remote} '
     # shlex.split breaks on windows paths
     # https://stackoverflow.com/a/63534016
