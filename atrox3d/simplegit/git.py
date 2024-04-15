@@ -2,6 +2,7 @@ print(f'IMPORT | {__name__}')
 
 from pathlib import Path
 import re
+import sys
 
 from .repo import GitRepo
 from .status import GitStatus
@@ -48,6 +49,22 @@ def get_remote(path:str) -> str:
     else:
         return None
 
+def _parse_status_filename(line:str, pattern:str, repo:GitRepo):
+    res = re.match(pattern, line)
+    try:
+        index, workspace, filename, newname = res.groupdict().values()
+        return index, workspace, filename, newname
+    except Exception as e:
+        import traceback
+        print('-' * 80)
+        print(repr(e))
+        print(traceback.format_exc())
+        print(f'{repo = }')
+        print(f'{line = }')
+        print(f'{res = }')
+        print('-' * 80)
+        sys.exit()
+
 def get_status(repo:GitRepo) -> GitStatus:
     '''
     factory method, creates GitStatus object from git status command
@@ -83,17 +100,7 @@ def get_status(repo:GitRepo) -> GitStatus:
     status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])' \
                      r'\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
     for line in [line for line in lines if len(line)]:
-        res = re.match(status_pattern, line)
-        try:
-            index, workspace, filename, newname = res.groupdict().values()
-        except Exception as e:
-            print('-' * 80)
-            print(repr(e))
-            print(f'{repo = }')
-            print(f'{line = }')
-            print(f'{res = }')
-            print('-' * 80)
-            raise e
+        index, workspace, filename, newname = _parse_status_filename(line, status_pattern, repo)
         
         status.dirty = True
 
