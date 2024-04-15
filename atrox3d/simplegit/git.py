@@ -49,8 +49,11 @@ def get_remote(path:str) -> str:
     else:
         return None
 
-def _parse_status_filename(line:str, pattern:str, repo:GitRepo):
-    res = re.match(pattern, line)
+def __parse_status_filename(line:str, repo:GitRepo):
+    # ^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$
+    status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])' \
+                     r'\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
+    res = re.match(status_pattern, line)
     try:
         index, workspace, filename, newname = res.groupdict().values()
         return index, workspace, filename, newname
@@ -65,6 +68,17 @@ def _parse_status_filename(line:str, pattern:str, repo:GitRepo):
         print('-' * 80)
         sys.exit()
 
+def _parse_status_filename(line:str, repo:GitRepo):
+    index = workspace = rest = filename = newname = None
+    index, workspace = line[:2]
+    rest = line[3:]
+    if '->' in rest:
+        filename, new = rest.split(' -> ')
+    else:
+        filename = rest
+
+    return index, workspace, filename, newname
+        
 def get_status(repo:GitRepo) -> GitStatus:
     '''
     factory method, creates GitStatus object from git status command
@@ -91,18 +105,15 @@ def get_status(repo:GitRepo) -> GitStatus:
     
     res = re.match(branch_pattern, branchstatus)
     status = GitStatus()
-    status.branch, status.remote, status.position, status.commits = res.groupdict().values()
+    status.branch, status.remote_branch, status.position, status.commits = res.groupdict().values()
 
     if status.position == 'ahead': status.need_push = True
     if status.position == 'behind': status.need_pull = True
     
-    # ^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$
-    status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])' \
-                     r'\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
     for line in [line for line in lines if len(line)]:
-        index, workspace, filename, newname = _parse_status_filename(line, status_pattern, repo)
-        
         status.dirty = True
+
+        index, workspace, filename, newname = _parse_status_filename(line, repo)
 
         if index + workspace == '??':
             status.untracked.append(filename)
