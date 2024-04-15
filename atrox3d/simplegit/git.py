@@ -79,11 +79,21 @@ def get_status(repo:GitRepo) -> GitStatus:
     if status.position == 'ahead': status.need_push = True
     if status.position == 'behind': status.need_pull = True
     
+    # ^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$
     status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])' \
                      r'\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
     for line in [line for line in lines if len(line)]:
         res = re.match(status_pattern, line)
-        index, workspace, filename, newname = res.groupdict().values()
+        try:
+            index, workspace, filename, newname = res.groupdict().values()
+        except Exception as e:
+            print('-' * 80)
+            print(repr(e))
+            print(f'{repo = }')
+            print(f'{line = }')
+            print(f'{res = }')
+            print('-' * 80)
+            raise e
         
         status.dirty = True
 
