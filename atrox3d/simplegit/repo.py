@@ -1,7 +1,3 @@
-# from modules.simplegit.git_helper import get_status
-# from modules.simplegit.status import GitStatus
-
-
 from dataclasses import dataclass, asdict
 from pathlib import Path
 
