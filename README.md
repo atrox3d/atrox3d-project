@@ -22,14 +22,17 @@ pip install -e . --config-settings editable_mode=compat
 vscode: ctrl+shift+p, "Python: Restart language server"
 
 # uninstall 
-pip uninstall snakesay
+pip uninstall atrox3d
 
 # run module using __main__.py
 python -m normalize
 python -m gitfiles
+python -m simplegit
 
 # run script defined in pyproject.toml
-snakey
+normalize
+gitfiles
+simplegit
 
 # deactivate venv
 deactivate
