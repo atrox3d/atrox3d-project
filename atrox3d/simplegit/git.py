@@ -142,7 +142,8 @@ def get_remote(path_or_repo:str|GitRepo) -> str:
     extracts remote from git remote command
     '''
     try:
-        result = git_command.run('git remote -v', path_or_repo)
+        path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
+        result = git_command.run('git remote -v', path)
     except GitCommandException as gce:
         raise GitException(gce)
 
@@ -151,6 +152,18 @@ def get_remote(path_or_repo:str|GitRepo) -> str:
         return url
     else:
         return None
+
+def get_current_branch(path_or_repo:str|GitRepo) -> str:
+    '''
+    extracts remote from git remote command
+    '''
+    try:
+        command = 'git branch --show-current'
+        path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
+        result = git_command.run(command, path)
+        return result.stdout.strip()
+    except GitCommandException as gce:
+        raise GitException(gce)
 
 def add(path_or_repo:str|GitRepo, *files:str, all:bool=False) -> str:
     command =  'git add '

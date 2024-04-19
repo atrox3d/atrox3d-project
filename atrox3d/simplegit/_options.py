@@ -6,25 +6,38 @@ def parse() -> argparse.Namespace:
         description="simplegit parser"
     )
 
+    # expect a command as first argument (branch, repo)
+    command = parser.add_subparsers(dest='command', help='Commands to run', 
+                                    required=True)
     
-    subparsers = parser.add_subparsers(
-                                        dest='command', 
-                                        help='Commands to run', 
-                                        required=True
-                                        )
+    # expect a subcommand as second argument (clean, updatemaster, foreach)
+    branch = command.add_parser('branch')
+    branch_command = branch.add_subparsers(dest='branch_command', help='Commands to run', 
+                                            required=True)
+    clean = branch_command.add_parser('clean')
+    clean.add_argument('-r', '--remote', default=False)
+    clean.add_argument('-l', '--local', default=False)
+    clean.add_argument('-f', '--force', default=False)
 
-    backup = subparsers.add_parser('backup')
-    backup.add_argument('-w', '--workspace', required=True)
-    backup.add_argument('-j', '--json', required=True)
-    backup.add_argument('-r', '--recurse', action='store_true', default=False)
+    updatemaster = branch_command.add_parser('updatemaster')
+    updatemaster.add_argument('-P', '--push', default=False)
+    
+    foreach = branch_command.add_parser('foreach')
+    foreach.add_argument('foreach', nargs='+')
+    # branch.add_argument('-w', '--workspace', required=True)
+    # branch.add_argument('-j', '--json', required=True)
+    # branch.add_argument('-r', '--recurse', action='store_true', default=False)
 
-    restore = subparsers.add_parser('restore')
-    restore.add_argument('-d', '--dryrun', action='store_false', default=True)
-    restore.add_argument('-j', '--json', required=True)
-    restore.add_argument('-p', '--destpath', required=True)
-    restore.add_argument('-b', '--breakonerrors', action='store_true', 
-                         default=True, help='recurse')
 
+
+    repo =  command.add_parser('repo')
+    # repo.add_argument('-d', '--dryrun', action='store_false', default=True)
+    # repo.add_argument('-j', '--json', required=True)
+    # repo.add_argument('-p', '--destpath', required=True)
+    # repo.add_argument('-b', '--breakonerrors', action='store_true', 
+                        #  default=True, help='recurse')
+
+    # return parser.parse_known_args()
     return parser.parse_args()
     
 
