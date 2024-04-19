@@ -149,17 +149,11 @@ def get_remote(path_or_repo:str|GitRepo) -> str:
     '''
     extracts remote from git remote command
     '''
-    try:
-        path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-        result = git_command.run('git remote -v', path)
-    except GitCommandException as gce:
-        raise GitException(gce)
-
-    if result.stdout:
-        name, url, mode = result.stdout.split('\n')[0].split()
-        return url
-    else:
-        return None
+    command = 'git remote -v'
+    result = _run(command, path_or_repo, format_streams=False)
+    # print(f'{result = }')
+    name, url, mode = result.split('\n')[0].split()
+    return url
 
 def get_current_branch(path_or_repo:str|GitRepo) -> str:
     '''
