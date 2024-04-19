@@ -53,7 +53,7 @@ def __parse_status_filename(line:str, repo:GitRepo):
         print('-' * 80)
         sys.exit()
 
-def _parse_status_filename(line:str, repo:GitRepo):
+def _parse_status_filename(line:str):
     index = workspace = rest = filename = newname = None
     index, workspace = line[:2]
     rest = line[3:]
@@ -98,7 +98,7 @@ def get_status(path_or_repo:str|GitRepo) -> GitStatus:
     for line in [line for line in lines if len(line)]:
         status.dirty = True
 
-        index, workspace, filename, newname = _parse_status_filename(line, repo)
+        index, workspace, filename, newname = _parse_status_filename(line)
 
         if index + workspace == '??':
             status.untracked.append(filename)
