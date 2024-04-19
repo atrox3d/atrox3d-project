@@ -77,13 +77,13 @@ def get_status(path_or_repo:str|GitRepo) -> GitStatus:
     the workspace status
     '''
     command = 'git status --branch --porcelain'
-    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-    try:
-        result = git_command.run(command, path)
-    except GitCommandException as gce:
-        raise GitException(gce)
-
-    branchstatus, *lines =  result.stdout.split('\n')
+    # path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
+    # try:
+    #     result = git_command.run(command, path)
+    # except GitCommandException as gce:
+    #     raise GitException(gce)
+    result = _run(command, path_or_repo, format_streams=False)
+    branchstatus, *lines =  result.split('\n')
     branch_pattern = r'^## (?P<branch>[^ .]+)' \
                      r'(\.{3}(?P<remote>\S+))' \
                      r'*( \[{0,1}(?P<position>\S+) (?P<commits>\d+)\]{0,1})*$'
@@ -151,8 +151,9 @@ def get_remote(path_or_repo:str|GitRepo) -> str:
     '''
     command = 'git remote -v'
     result = _run(command, path_or_repo, format_streams=False)
-    # print(f'{result = }')
-    name, url, mode = result.split('\n')[0].split()
+    url = None
+    if result:
+        name, url, mode = result.split('\n')[0].split()
     return url
 
 def get_current_branch(path_or_repo:str|GitRepo) -> str:
