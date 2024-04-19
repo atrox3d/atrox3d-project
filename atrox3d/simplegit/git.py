@@ -34,21 +34,6 @@ def is_repo(path:str) -> bool:
         return gitdir.is_dir()
     raise FileNotFoundError(f'is_repo: {repodir} does not exist')
 
-def get_remote(path:str) -> str:
-    '''
-    extracts remote from git remote command
-    '''
-    try:
-        result = git_command.run('git remote -v', path)
-    except GitCommandException as gce:
-        raise GitException(gce)
-
-    if result.stdout:
-        name, url, mode = result.stdout.split('\n')[0].split()
-        return url
-    else:
-        return None
-
 def __parse_status_filename(line:str, repo:GitRepo):
     # ^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$
     status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])' \
@@ -79,7 +64,7 @@ def _parse_status_filename(line:str, repo:GitRepo):
 
     return index, workspace, filename, newname
         
-def get_status(repo:GitRepo) -> GitStatus:
+def get_status(path_or_repo:str|GitRepo) -> GitStatus:
     '''
     factory method, creates GitStatus object from git status command
 
@@ -92,9 +77,9 @@ def get_status(repo:GitRepo) -> GitStatus:
     the workspace status
     '''
     command = 'git status --branch --porcelain'
-
+    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     try:
-        result = git_command.run(command, repo.path)
+        result = git_command.run(command, path)
     except GitCommandException as gce:
         raise GitException(gce)
 
@@ -141,41 +126,52 @@ def _format_stream(stream, prefix) -> str:
         [f'{prefix} | {line}' for line in stream.rstrip().split('\n')]
     )
 
-def _run(command, path) -> str:
+def _run(command, path_or_repo:str|GitRepo) -> str:
     ''' helper: runs command and returns formatted stdout+stderr '''
+    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     try:
         result = git_command.run(command, path)
     except GitCommandException as gce:
         raise GitException(gce)
     return _format_stream(result.stdout, command) + '\n' + _format_stream(result.stderr, command)
 
+def get_remote(path_or_repo:str|GitRepo) -> str:
+    '''
+    extracts remote from git remote command
+    '''
+    try:
+        result = git_command.run('git remote -v', path_or_repo)
+    except GitCommandException as gce:
+        raise GitException(gce)
+
+    if result.stdout:
+        name, url, mode = result.stdout.split('\n')[0].split()
+        return url
+    else:
+        return None
+
 def add(path_or_repo:str|GitRepo, *files:str, all:bool=False) -> str:
     command =  'git add '
     command += '.' if all else ' '.join(files)
-    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-    return _run(command, path)
+    return _run(command, path_or_repo)
 
 def commit(path_or_repo:str|GitRepo, comment:str, add_all:bool=False) -> str:
     command =  'git commit '
     command += '-am ' if add_all else '-m'
     command += f'\'{comment}\''
-    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-    return _run(command, path)
+    return _run(command, path_or_repo)
 
 def fetch(path_or_repo:str|GitRepo) -> str:
     command = 'git fetch'
-    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-    return _run(command, path)
+    return _run(command, path_or_repo)
 
 def push(path_or_repo:str|GitRepo) -> str:
     command = 'git push'
-    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-    return _run(command, path)
+    return _run(command, path_or_repo)
 
 def pull(path_or_repo:str|GitRepo) -> str:
     command = 'git pull'
-    path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-    return _run(command, path)
+    return _run(command, path_or_repo)
 
 def clone(remote: str, dest_path: str, path: str='.') -> str:
     command = f'git clone {remote} '
