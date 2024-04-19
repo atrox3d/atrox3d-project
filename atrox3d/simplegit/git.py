@@ -121,7 +121,7 @@ def get_status(path_or_repo:str|GitRepo) -> GitStatus:
     return status
 
 
-def _run(command, path_or_repo:str|GitRepo) -> str:
+def _run(command, path_or_repo:str|GitRepo, format_streams=True) -> str:
     ''' helper: runs command and returns formatted stdout+stderr '''
 
     def _format_stream(stream, prefix) -> str:
@@ -133,9 +133,17 @@ def _run(command, path_or_repo:str|GitRepo) -> str:
     path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     try:
         result = git_command.run(command, path)
+        if format_streams:
+            return  _format_stream(result.stdout, command) + \
+                    '\n' + \
+                    _format_stream(result.stderr, command)
+        else:
+            ret = result.stdout.strip()
+            if result.stderr:
+                ret += '\n' + ret.sterr.strip()
+            return ret
     except GitCommandException as gce:
         raise GitException(gce)
-    return _format_stream(result.stdout, command) + '\n' + _format_stream(result.stderr, command)
 
 def get_remote(path_or_repo:str|GitRepo) -> str:
     '''
@@ -157,13 +165,8 @@ def get_current_branch(path_or_repo:str|GitRepo) -> str:
     '''
     extracts remote from git remote command
     '''
-    try:
-        command = 'git branch --show-current'
-        path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-        result = git_command.run(command, path)
-        return result.stdout.strip()
-    except GitCommandException as gce:
-        raise GitException(gce)
+    command = 'git branch --show-current'
+    return _run(command, path_or_repo, format_streams=False)
 
 def add(path_or_repo:str|GitRepo, *files:str, all:bool=False) -> str:
     command =  'git add '
