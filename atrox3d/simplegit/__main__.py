@@ -12,15 +12,17 @@ def main():
 
     try:
         repo = git.get_repo(os.getcwd())
-        branch = git.get_current_branch(repo)
-        print(f'{branch = }')
+        current_branch = git.get_current_branch(repo)
+        print(f'{current_branch = }')
+
         match args.command:
             case 'branch':
                 match args.branch_command:
                     case 'clean':
                         pass
                     case 'updatemaster':
-                        pass
+                        branches = git.get_branches(repo, local=True, remote=False)
+                        print(branches)
                     case 'foreach':
                         pass
 

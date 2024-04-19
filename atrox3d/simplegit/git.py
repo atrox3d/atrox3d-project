@@ -138,9 +138,9 @@ def _run(command, path_or_repo:str|GitRepo, format_streams=True) -> str:
                     '\n' + \
                     _format_stream(result.stderr, command)
         else:
-            ret = result.stdout.strip()
+            ret = result.stdout.rstrip()
             if result.stderr:
-                ret += '\n' + ret.sterr.strip()
+                ret += '\n' + ret.sterr.rstrip()
             return ret
     except GitCommandException as gce:
         raise GitException(gce)
@@ -155,13 +155,6 @@ def get_remote(path_or_repo:str|GitRepo) -> str:
     if result:
         name, url, mode = result.split('\n')[0].split()
     return url
-
-def get_current_branch(path_or_repo:str|GitRepo) -> str:
-    '''
-    extracts remote from git remote command
-    '''
-    command = 'git branch --show-current'
-    return _run(command, path_or_repo, format_streams=False)
 
 def add(path_or_repo:str|GitRepo, *files:str, all:bool=False) -> str:
     command =  'git add '
@@ -192,3 +185,29 @@ def clone(remote: str, dest_path: str, path: str='.') -> str:
     # https://stackoverflow.com/a/63534016
     command += str(Path(dest_path).as_posix())
     return _run(command, path)
+
+def get_current_branch(path_or_repo:str|GitRepo) -> str:
+    '''
+    extracts remote from git remote command
+    '''
+    command = 'git branch --show-current'
+    return _run(command, path_or_repo, format_streams=False)
+
+def switch(path_or_repo:str|GitRepo, branch:str) -> str:
+    command = f'git switch {branch}'
+    return _run(command, path_or_repo)
+
+def get_branches(path_or_repo:str|GitRepo, local=True, remote=False) -> list[str]:
+    command = 'git branch'
+    branches = []
+
+    if local:
+        output = _run(command, path_or_repo, format_streams=False)
+        branches.extend([branch[2:] for branch in output.split('\n')])
+    if remote:
+        command += ' -r'
+        output = _run(command, path_or_repo, format_streams=False)
+        branches.extend([branch[2:] for branch in output.split('\n')])
+    return branches
+
+
