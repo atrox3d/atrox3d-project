@@ -21,6 +21,8 @@ def main():
                     case 'clean':
                         pass
                     case 'updatemaster':
+                        git.switch(repo, 'master')
+                        print(git.get_current_branch(repo))
                         branches = git.get_branches(repo, local=True, remote=False)
                         print(branches)
                     case 'foreach':
