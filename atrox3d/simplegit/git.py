@@ -120,14 +120,16 @@ def get_status(path_or_repo:str|GitRepo) -> GitStatus:
                     raise ValueError(f'unknown {flag=!r} in status {line.split()!r}')
     return status
 
-def _format_stream(stream, prefix) -> str:
-    ''' helper: returns formatted stream with prefix '''
-    return '\n'.join(
-        [f'{prefix} | {line}' for line in stream.rstrip().split('\n')]
-    )
 
 def _run(command, path_or_repo:str|GitRepo) -> str:
     ''' helper: runs command and returns formatted stdout+stderr '''
+
+    def _format_stream(stream, prefix) -> str:
+        ''' helper: returns formatted stream with prefix '''
+        return '\n'.join(
+            [f'{prefix} | {line}' for line in stream.rstrip().split('\n')]
+        )
+
     path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     try:
         result = git_command.run(command, path)
