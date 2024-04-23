@@ -14,6 +14,7 @@ def main():
         repo = git.get_repo(os.getcwd())
         current_branch = git.get_current_branch(repo)
         print(f'{current_branch = }')
+        status = git.get_status(repo)
 
         match args.command:
             case 'branch':
@@ -21,10 +22,14 @@ def main():
                     case 'clean':
                         pass
                     case 'updatemaster':
+                        if status.dirty:
+                            print(f'ERROR | repo is dirty: commit or stash changes')
+                            sys.exit(1)
                         git.switch(repo, 'master')
                         print(git.get_current_branch(repo))
                         branches = git.get_branches(repo, local=True, remote=False)
                         print(branches)
+                        git.switch(repo, current_branch)
                     case 'foreach':
                         pass
 
