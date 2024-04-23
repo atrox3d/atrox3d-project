@@ -27,8 +27,10 @@ def main():
                             sys.exit(1)
                         git.switch(repo, 'master')
                         print(f'current branch: {git.get_current_branch(repo)}')
-                        branches = git.get_branches(repo, local=True, remote=False)
-                        print(f'local {branches = }')
+                        local_branches = git.get_branches(repo, local=True, remote=False)
+                        print(f'local {local_branches = }')
+                        remote_branches = git.get_branches(repo, local=True, remote=False)
+                        print(f'local {remote_branches = }')
                         git.switch(repo, current_branch)
                         print(f'current branch: {git.get_current_branch(repo)}')
                     case 'foreach':
