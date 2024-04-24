@@ -25,14 +25,20 @@ def main():
                         if status.dirty:
                             print(f'ERROR | repo is dirty: commit or stash changes')
                             sys.exit(1)
-                        git.switch(repo, 'master')
-                        print(f'current branch: {git.get_current_branch(repo)}')
-                        local_branches = git.get_branches(repo, local=True, remote=False)
-                        print(f'{local_branches = }')
-                        remote_branches = git.get_branches(repo, local=False, remote=True)
-                        print(f'{remote_branches = }')
-                        git.switch(repo, current_branch)
-                        print(f'current branch: {git.get_current_branch(repo)}')
+                        else:
+                            git.switch(repo, 'master')
+                            print(f'current branch: {git.get_current_branch(repo)}')
+                            
+                            local_branches = git.get_branches(repo, local=True, remote=False)
+                            print(f'{local_branches = }')
+                            
+                            remote_branches = git.get_branches(repo, local=False, remote=True)
+                            print(f'{remote_branches = }')
+                            
+                            # git merge from current_branch
+                            
+                            git.switch(repo, current_branch)
+                            print(f'current branch: {git.get_current_branch(repo)}')
                     case 'foreach':
                         pass
 
