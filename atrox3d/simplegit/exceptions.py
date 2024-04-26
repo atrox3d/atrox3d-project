@@ -12,7 +12,7 @@ class GitException(Exception):
         # super().__init__(*args)
         super().__init__('\n'.join(map(str, args)))
 
-class GitRepoNotFoundException(FileNotFoundError): pass
+class GitRepoNotFoundException(GitException): pass
 
 class GitNotARepoException(GitException): pass
 
