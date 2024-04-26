@@ -36,13 +36,13 @@ def main():
                             print(f'{remote_branches = }')
                             
                             # git merge from current_branch
-                            
+
                             git.switch(repo, current_branch)
                             print(f'current branch: {git.get_current_branch(repo)}')
                     case 'foreach':
                         pass
 
-    except git.NotAGitRepo:
+    except git.GitNotARepoException:
         print('please run this command inside a git repo')
         sys.exit(1)
     
