@@ -38,7 +38,7 @@ def scan(*paths: str, remote :bool=None, recurse: bool=True, absolute :bool=Fals
                 repo = git.get_repo(path)
                 if filter_repo(repo, remote) is not False:
                     yield repo
-            except git.NotAGitRepo:
+            except git.GitNotARepoException:
                 pass
 
 def collect(*paths: str, recurse: bool, absolute=False) -> dict:

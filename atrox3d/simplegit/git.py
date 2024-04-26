@@ -8,14 +8,25 @@ from .repo import GitRepo
 from .status import GitStatus
 
 from . import git_command
-from .git_command import GitCommandException
-
-class GitException(GitCommandException):
-    def __init__(self, gce: GitCommandException):
-        super().__init__(**vars(gce))
-
-class NotAGitRepo(Exception):
-    pass
+from .exceptions import (
+    GitException,
+    GitCommandException,
+    GitRepoNotFoundException,
+    GitNotARepoException,
+    GitStatusException,
+    GitRemoteException,
+    GitAddException,
+    GitCommitException,
+    GitFetchException,
+    GitPushException,
+    GitPullException,
+    GitCloneException,
+    GitCurrentBranchException,
+    GitSwitchException,
+    GitInvalidCurrentBranch,
+    GitMergeException,
+    GitGetBranchesException,
+)
 
 def get_repo(path:str, name=None) -> GitRepo:
     '''
@@ -25,33 +36,33 @@ def get_repo(path:str, name=None) -> GitRepo:
         remote = get_remote(path)
         repo = GitRepo(path, remote, name=name)
         return repo
-    raise NotAGitRepo(f'path {path} is not a git repo')
+    raise GitNotARepoException(f'path {path} is not a git repo')
 
 def is_repo(path:str) -> bool:
     repodir =  Path(path)
     if repodir.exists():
         gitdir = repodir / '.git'
         return gitdir.is_dir()
-    raise FileNotFoundError(f'is_repo: {repodir} does not exist')
+    raise GitRepoNotFoundException(f'is_repo: {repodir} does not exist')
 
-def __parse_status_filename(line:str, repo:GitRepo):
-    # ^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$
-    status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])' \
-                     r'\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
-    res = re.match(status_pattern, line)
-    try:
-        index, workspace, filename, newname = res.groupdict().values()
-        return index, workspace, filename, newname
-    except Exception as e:
-        import traceback
-        print('-' * 80)
-        print(repr(e))
-        print(traceback.format_exc())
-        print(f'{repo = }')
-        print(f'{line = }')
-        print(f'{res = }')
-        print('-' * 80)
-        sys.exit()
+# def __parse_status_filename(line:str, repo:GitRepo):
+#     # ^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$
+#     status_pattern = r'^(?P<index>[ ?AMDR])(?P<workspace>[ ?AMDR])' \
+#                      r'\s(?P<filename>\S+)(?: -> )*(?P<newname>\S+)*$'
+#     res = re.match(status_pattern, line)
+#     try:
+#         index, workspace, filename, newname = res.groupdict().values()
+#         return index, workspace, filename, newname
+#     except Exception as e:
+#         import traceback
+#         print('-' * 80)
+#         print(repr(e))
+#         print(traceback.format_exc())
+#         print(f'{repo = }')
+#         print(f'{line = }')
+#         print(f'{res = }')
+#         print('-' * 80)
+#         sys.exit()
 
 def _parse_status_filename(line:str):
     index = workspace = rest = filename = newname = None
@@ -82,7 +93,11 @@ def get_status(path_or_repo:str|GitRepo) -> GitStatus:
     #     result = git_command.run(command, path)
     # except GitCommandException as gce:
     #     raise GitException(gce)
-    result = _run(command, path_or_repo, format_streams=False)
+    try:
+        result = _run(command, path_or_repo, format_streams=False)
+    except GitCommandException as gce:
+        raise GitStatusException(gce)
+    
     branchstatus, *lines =  result.split('\n')
     branch_pattern = r'^## (?P<branch>[^ .]+)' \
                      r'(\.{3}(?P<remote>\S+))' \
@@ -117,7 +132,7 @@ def get_status(path_or_repo:str|GitRepo) -> GitStatus:
                     # status.deleted.append(filename)
                     status.renamed.append((filename, newname))
                 case _:
-                    raise ValueError(f'unknown {flag=!r} in status {line.split()!r}')
+                    raise GitStatusException(f'unknown {flag=!r} in status {line.split()!r}')
     return status
 
 
@@ -131,26 +146,29 @@ def _run(command, path_or_repo:str|GitRepo, format_streams=True) -> str:
         )
 
     path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
-    try:
-        result = git_command.run(command, path)
-        if format_streams:
-            return  _format_stream(result.stdout, command) + \
-                    '\n' + \
-                    _format_stream(result.stderr, command)
-        else:
-            ret = result.stdout.rstrip()
-            if result.stderr:
-                ret += '\n' + ret.sterr.rstrip()
-            return ret
-    except GitCommandException as gce:
-        raise GitException(gce)
+    # try:
+    result = git_command.run(command, path)
+    if format_streams:
+        return  _format_stream(result.stdout, command) + \
+                '\n' + \
+                _format_stream(result.stderr, command)
+    else:
+        ret = result.stdout.rstrip()
+        if result.stderr:
+            ret += '\n' + ret.sterr.rstrip()
+        return ret
+    # except GitCommandException as gce:
+        # raise GitException(gce)
 
 def get_remote(path_or_repo:str|GitRepo) -> str:
     '''
     extracts remote from git remote command
     '''
     command = 'git remote -v'
-    result = _run(command, path_or_repo, format_streams=False)
+    try:
+        result = _run(command, path_or_repo, format_streams=False)
+    except GitCommandException as gce:
+        raise GitRemoteException(gce)
     url = None
     if result:
         name, url, mode = result.split('\n')[0].split()
@@ -159,55 +177,94 @@ def get_remote(path_or_repo:str|GitRepo) -> str:
 def add(path_or_repo:str|GitRepo, *files:str, all:bool=False) -> str:
     command =  'git add '
     command += '.' if all else ' '.join(files)
-    return _run(command, path_or_repo)
-
+    try:
+        return _run(command, path_or_repo)
+    except GitCommandException as gce:
+        raise GitAddException(gce)
+    
 def commit(path_or_repo:str|GitRepo, comment:str, add_all:bool=False) -> str:
     command =  'git commit '
     command += '-am ' if add_all else '-m'
     command += f'\'{comment}\''
-    return _run(command, path_or_repo)
+    try:
+        return _run(command, path_or_repo)
+    except GitCommandException as gce:
+        raise GitCommitException(gce)
 
 def fetch(path_or_repo:str|GitRepo) -> str:
     command = 'git fetch'
-    return _run(command, path_or_repo)
+    try:
+        return _run(command, path_or_repo)
+    except GitCommandException as gce:
+        raise GitFetchException(gce)
 
 def push(path_or_repo:str|GitRepo) -> str:
     command = 'git push'
-    return _run(command, path_or_repo)
+    try:
+        return _run(command, path_or_repo)
+    except GitCommandException as gce:
+        raise GitPushException(gce)
 
 def pull(path_or_repo:str|GitRepo) -> str:
     command = 'git pull'
-    return _run(command, path_or_repo)
+    try:
+        return _run(command, path_or_repo)
+    except GitCommandException as gce:
+        raise GitPullException(gce)
+
 
 def clone(remote: str, dest_path: str, path: str='.') -> str:
     command = f'git clone {remote} '
     # shlex.split breaks on windows paths
     # https://stackoverflow.com/a/63534016
     command += str(Path(dest_path).as_posix())
-    return _run(command, path)
+    try:
+        return _run(command, path)
+    except GitCommandException as gce:
+        raise GitCloneException(gce)
+
 
 def get_current_branch(path_or_repo:str|GitRepo) -> str:
     '''
     extracts remote from git remote command
     '''
     command = 'git branch --show-current'
-    return _run(command, path_or_repo, format_streams=False)
+    try:
+        return _run(command, path_or_repo, format_streams=False)
+    except GitCommandException as gce:
+        raise GitCurrentBranchException(gce)
 
 def switch(path_or_repo:str|GitRepo, branch:str) -> str:
     command = f'git switch {branch}'
-    return _run(command, path_or_repo)
+    try:
+        return _run(command, path_or_repo)
+    except GitCommandException as gce:
+        raise GitSwitchException(gce)
+
+def merge(path_or_repo:str|GitRepo, branch:str, from_branch:str) -> str:
+    current_branch = get_current_branch(path_or_repo)
+    if current_branch != branch:
+        raise GitInvalidCurrentBranch(f'current branch {current_branch} differs from {branch}')
+    merge = f'git merge {from_branch}'
+    try:
+        return _run(merge, path_or_repo)
+    except GitCommandException as gce:
+        raise GitMergeException(gce)
 
 def get_branches(path_or_repo:str|GitRepo, local=True, remote=False) -> list[str]:
     command = 'git branch'
     branches = []
 
-    if local:
-        output = _run(command, path_or_repo, format_streams=False)
-        branches.extend([branch[2:] for branch in output.split('\n')])
-    if remote:
-        command += ' -r'
-        output = _run(command, path_or_repo, format_streams=False)
-        branches.extend([branch[2:] for branch in output.split('\n')])
-    return branches
+    try:
+        if local:
+            output = _run(command, path_or_repo, format_streams=False)
+            branches.extend([branch[2:] for branch in output.split('\n')])
+        if remote:
+            command += ' -r'
+            output = _run(command, path_or_repo, format_streams=False)
+            branches.extend([branch[2:] for branch in output.split('\n')])
+        return branches
+    except GitCommandException as gce:
+        raise GitGetBranchesException(gce)
 
 
