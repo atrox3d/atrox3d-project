@@ -22,7 +22,20 @@ def main():
             case 'branch':
                 match args.branch_command:
                     case 'clean':
-                        pass
+                        if args.local:
+                            print('getting local branches...')
+                            local_branches = git.get_branches(repo, local=True, remote=False)
+                            print(f'{local_branches = }')
+                        else:
+                            print('skipping local branches...')
+                        
+                        if args.remote:
+                            print('getting remote branches...')
+                            remote_branches = git.get_branches(repo, local=False, remote=True)
+                            print(f'{remote_branches = }')
+                        else:
+                            print('skipping remote branches...')
+
                     case 'updatemaster':
                         if status.dirty:
                             print(f'ERROR | repo is dirty: commit or stash changes')
@@ -32,16 +45,7 @@ def main():
                             git.switch(repo, 'master')
                             print(f'current branch: {git.get_current_branch(repo)}')
                             
-                            print('getting local branches...')
-                            local_branches = git.get_branches(repo, local=True, remote=False)
-                            print(f'{local_branches = }')
-                            
-                            print('getting remote branches...')
-                            remote_branches = git.get_branches(repo, local=False, remote=True)
-                            print(f'{remote_branches = }')
-                            
                             print(f'merging from {current_branch}...')
-                            # git merge from current_branch
                             git.merge(repo, 'master', current_branch)
 
                             print(f'switching back to {current_branch}...')
