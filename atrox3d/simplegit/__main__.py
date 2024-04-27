@@ -22,15 +22,13 @@ def main():
             case 'branch':
                 match args.branch_command:
                     case 'clean':
-                        if current_branch != 'master':
-                            raise git.GitException('must be on branch master to clean branches')
                         if args.local:
                             print('getting local branches...')
                             local_branches = git.get_branches(repo, local=True, remote=False)
                             print(f'{local_branches = }')
                             for branch in local_branches:
-                                if branch == 'master':
-                                    print('skipping master...')
+                                if branch in ('master', current_branch):
+                                    print(f'skipping {branch}...')
                                 else:
                                     git.delete_branch(repo, branch, local=True, force=args.force)
                         else:
