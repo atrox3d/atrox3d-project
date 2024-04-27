@@ -12,8 +12,10 @@ def main():
 
     try:
         repo = git.get_repo(os.getcwd())
+        
         current_branch = git.get_current_branch(repo)
         print(f'{current_branch = }')
+        
         status = git.get_status(repo)
 
         match args.command:
@@ -30,14 +32,18 @@ def main():
                             git.switch(repo, 'master')
                             print(f'current branch: {git.get_current_branch(repo)}')
                             
+                            print('getting local branches...')
                             local_branches = git.get_branches(repo, local=True, remote=False)
                             print(f'{local_branches = }')
                             
+                            print('getting remote branches...')
                             remote_branches = git.get_branches(repo, local=False, remote=True)
                             print(f'{remote_branches = }')
                             
+                            print(f'merging from {current_branch}...')
                             # git merge from current_branch
 
+                            print(f'switching back to {current_branch}...')
                             git.switch(repo, current_branch)
                             print(f'current branch: {git.get_current_branch(repo)}')
                     case 'foreach':
