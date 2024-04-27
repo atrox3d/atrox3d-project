@@ -29,7 +29,10 @@ def main():
                             local_branches = git.get_branches(repo, local=True, remote=False)
                             print(f'{local_branches = }')
                             for branch in local_branches:
-                                git.delete_branch(repo, branch, local=True)
+                                if branch == 'master':
+                                    print('skipping master...')
+                                else:
+                                    git.delete_branch(repo, branch, local=True, force=args.force)
                         else:
                             print('skipping local branches...')
                         
@@ -38,7 +41,11 @@ def main():
                             remote_branches = git.get_branches(repo, local=False, remote=True)
                             print(f'{remote_branches = }')
                             for branch in remote_branches:
-                                git.delete_branch(repo, branch, remote=True)
+                                branch = branch.removeprefix('origin/')
+                                if branch == 'master':
+                                    print('skipping master...')
+                                else:
+                                    git.delete_branch(repo, branch, remote=True)
                         else:
                             print('skipping remote branches...')
 

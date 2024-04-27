@@ -26,6 +26,7 @@ from .exceptions import (
     GitInvalidCurrentBranch,
     GitMergeException,
     GitGetBranchesException,
+    GitDeleteBrancheException,
 )
 
 def get_repo(path:str, name=None) -> GitRepo:
@@ -276,3 +277,7 @@ def delete_branch(path_or_repo, branch, local=False, force=False, remote=False):
     if remote:
             command = f'git push origin :{branch}'
     print(command)
+    try:
+        return _run(command, path_or_repo)
+    except GitCommandException as gce:
+        raise GitDeleteBrancheException(gce)

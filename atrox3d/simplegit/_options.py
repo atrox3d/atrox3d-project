@@ -15,9 +15,9 @@ def parse() -> argparse.Namespace:
     branch_command = branch.add_subparsers(dest='branch_command', help='Commands to run', 
                                             required=True)
     clean = branch_command.add_parser('clean')
-    clean.add_argument('-r', '--remote', default=False)
-    clean.add_argument('-l', '--local', default=False)
-    clean.add_argument('-f', '--force', default=False)
+    clean.add_argument('-r', '--remote', action='store_true')
+    clean.add_argument('-l', '--local', action='store_true')
+    clean.add_argument('-f', '--force', action='store_true')
 
     updatemaster = branch_command.add_parser('updatemaster')
     updatemaster.add_argument('-P', '--push', default=False)

@@ -42,6 +42,8 @@ class GitMergeException(GitException): pass
 
 class GitGetBranchesException(GitException): pass
 
+class GitDeleteBrancheException(GitException): pass
+
 
 if __name__ == '__main__':
     print('hello')
