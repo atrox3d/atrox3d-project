@@ -1,6 +1,7 @@
 import logging
 
 logger = logging.getLogger(__name__)
+logger.debug(f"import {__name__}")
 
 try:
     from .git_command import GitCommandException

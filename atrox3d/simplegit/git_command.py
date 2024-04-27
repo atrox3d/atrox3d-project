@@ -1,4 +1,7 @@
-# print(f'IMPORT | {__name__}')
+import logging
+
+logger = logging.getLogger(__name__)
+logger.debug(f"import {__name__}")
 
 from pathlib import Path
 import subprocess

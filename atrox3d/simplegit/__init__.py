@@ -1,5 +1,7 @@
-# print(f'IMPORT | {__name__}')
-# print(f'IMPORT | {__name__} | from . import git')
+import logging
+
+logger = logging.getLogger(__name__)
+logger.debug(f"import {__name__}")
+
 from . import git
-# print(f'IMPORT | {__name__} | from . import repos')
 from . import repos

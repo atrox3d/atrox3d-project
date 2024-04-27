@@ -3,17 +3,18 @@ import sys
 import logging
 from pathlib import Path
 
+# print('main: define loggger')
 LOGFILE = str(Path(__file__).parent / Path(__file__).stem) + '.log'
 handlers = [
     logging.FileHandler(LOGFILE, mode='w'),
     logging.StreamHandler()
 ]
 logging.basicConfig(level='DEBUG', format='%(levelname)5s | %(message)s', handlers=handlers)
+logger = logging.getLogger(__name__)
 
 from . import _options
 from . import git
 
-logger = logging.getLogger(__name__)
 
 def main():
     args = _options.parse()
