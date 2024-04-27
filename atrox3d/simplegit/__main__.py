@@ -22,6 +22,8 @@ def main():
             case 'branch':
                 match args.branch_command:
                     case 'clean':
+                        if current_branch != 'master':
+                            raise git.GitException('must be on branch master to clean branches')
                         if args.local:
                             print('getting local branches...')
                             local_branches = git.get_branches(repo, local=True, remote=False)
@@ -57,4 +59,8 @@ def main():
     except git.GitNotARepoException:
         print('please run this command inside a git repo')
         sys.exit(1)
+    except git.GitException as ge:
+        print(f'{ge.__module__}.{ge.__class__.__qualname__}: {ge}')
+        sys.exit(1)
+    
     
