@@ -28,6 +28,8 @@ def main():
                             print('getting local branches...')
                             local_branches = git.get_branches(repo, local=True, remote=False)
                             print(f'{local_branches = }')
+                            for branch in local_branches:
+                                git.delete_branch(repo, branch, local=True)
                         else:
                             print('skipping local branches...')
                         
@@ -35,6 +37,8 @@ def main():
                             print('getting remote branches...')
                             remote_branches = git.get_branches(repo, local=False, remote=True)
                             print(f'{remote_branches = }')
+                            for branch in remote_branches:
+                                git.delete_branch(repo, branch, remote=True)
                         else:
                             print('skipping remote branches...')
 

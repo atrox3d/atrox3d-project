@@ -267,4 +267,12 @@ def get_branches(path_or_repo:str|GitRepo, local=True, remote=False) -> list[str
     except GitCommandException as gce:
         raise GitGetBranchesException(gce)
 
-
+def delete_branch(path_or_repo, branch, local=False, force=False, remote=False):
+    if local:
+        if force:
+            command = f'git branch -D {branch}'
+        else:
+            command = f'git branch -d {branch}'
+    if remote:
+            command = f'git push origin :{branch}'
+    print(command)
