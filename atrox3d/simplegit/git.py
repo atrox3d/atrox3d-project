@@ -37,6 +37,7 @@ def get_repo(path:str, name=None) -> GitRepo:
     factory method, creates GitRepo object from path
     '''
     if is_repo(path):
+        logger.debug(f'getting repo from {path = }')
         remote = get_remote(path)
         repo = GitRepo(path, remote, name=name)
         return repo
@@ -44,6 +45,7 @@ def get_repo(path:str, name=None) -> GitRepo:
 
 def is_repo(path:str) -> bool:
     repodir =  Path(path)
+    logger.debug(f'checking repo in {path = }')
     if repodir.exists():
         gitdir = repodir / '.git'
         return gitdir.is_dir()
@@ -69,6 +71,7 @@ def is_repo(path:str) -> bool:
 #         sys.exit()
 
 def _parse_status_filename(line:str):
+    logger.debug(f'parsing {line = }')
     index = workspace = rest = filename = newname = None
     index, workspace = line[:2]
     rest = line[3:]
@@ -98,6 +101,7 @@ def get_status(path_or_repo:str|GitRepo) -> GitStatus:
     # except GitCommandException as gce:
     #     raise GitException(gce)
     try:
+        logger.debug(f'getting status from {path_or_repo = }')
         result = _run(command, path_or_repo, format_streams=False)
     except GitCommandException as gce:
         raise GitStatusException(gce)
@@ -170,6 +174,7 @@ def get_remote(path_or_repo:str|GitRepo) -> str:
     '''
     command = 'git remote -v'
     try:
+        logger.debug(f'getting remote from {path_or_repo = }')
         result = _run(command, path_or_repo, format_streams=False)
     except GitCommandException as gce:
         raise GitRemoteException(gce)
@@ -182,6 +187,7 @@ def add(path_or_repo:str|GitRepo, *files:str, all:bool=False) -> str:
     command =  'git add '
     command += '.' if all else ' '.join(files)
     try:
+        logger.debug(f'adding files {files}')
         return _run(command, path_or_repo)
     except GitCommandException as gce:
         raise GitAddException(gce)
@@ -191,6 +197,7 @@ def commit(path_or_repo:str|GitRepo, comment:str, add_all:bool=False) -> str:
     command += '-am ' if add_all else '-m'
     command += f'\'{comment}\''
     try:
+        logger.debug(f'creating commit')
         return _run(command, path_or_repo)
     except GitCommandException as gce:
         raise GitCommitException(gce)
@@ -198,6 +205,7 @@ def commit(path_or_repo:str|GitRepo, comment:str, add_all:bool=False) -> str:
 def fetch(path_or_repo:str|GitRepo) -> str:
     command = 'git fetch'
     try:
+        logger.debug(f'fetching remote for {path_or_repo}')
         return _run(command, path_or_repo)
     except GitCommandException as gce:
         raise GitFetchException(gce)
@@ -205,6 +213,7 @@ def fetch(path_or_repo:str|GitRepo) -> str:
 def push(path_or_repo:str|GitRepo) -> str:
     command = 'git push'
     try:
+        logger.debug(f'pushing to remote')
         return _run(command, path_or_repo)
     except GitCommandException as gce:
         raise GitPushException(gce)
@@ -212,6 +221,7 @@ def push(path_or_repo:str|GitRepo) -> str:
 def pull(path_or_repo:str|GitRepo) -> str:
     command = 'git pull'
     try:
+        logger.debug(f'pulling from remote')
         return _run(command, path_or_repo)
     except GitCommandException as gce:
         raise GitPullException(gce)
@@ -223,6 +233,7 @@ def clone(remote: str, dest_path: str, path: str='.') -> str:
     # https://stackoverflow.com/a/63534016
     command += str(Path(dest_path).as_posix())
     try:
+        logger.debug(f'cloning from {remote} into {path}')
         return _run(command, path)
     except GitCommandException as gce:
         raise GitCloneException(gce)
@@ -234,6 +245,7 @@ def get_current_branch(path_or_repo:str|GitRepo) -> str:
     '''
     command = 'git branch --show-current'
     try:
+        logger.debug(f'getting current branch')
         return _run(command, path_or_repo, format_streams=False)
     except GitCommandException as gce:
         raise GitCurrentBranchException(gce)
@@ -241,6 +253,7 @@ def get_current_branch(path_or_repo:str|GitRepo) -> str:
 def switch(path_or_repo:str|GitRepo, branch:str) -> str:
     command = f'git switch {branch}'
     try:
+        logger.debug(f'switching to branch {branch}')
         return _run(command, path_or_repo)
     except GitCommandException as gce:
         raise GitSwitchException(gce)
@@ -251,6 +264,7 @@ def merge(path_or_repo:str|GitRepo, branch:str, from_branch:str) -> str:
         raise GitInvalidCurrentBranch(f'current branch {current_branch} differs from {branch}')
     merge = f'git merge {from_branch}'
     try:
+        logger.debug(f'merging from branch {from_branch}')
         return _run(merge, path_or_repo)
     except GitCommandException as gce:
         raise GitMergeException(gce)
@@ -261,9 +275,11 @@ def get_branches(path_or_repo:str|GitRepo, local=True, remote=False) -> list[str
 
     try:
         if local:
+            logger.debug(f'getting local branches')
             output = _run(command, path_or_repo, format_streams=False)
             branches.extend([branch[2:] for branch in output.split('\n')])
         if remote:
+            logger.debug(f'getting remote branches')
             command += ' -r'
             output = _run(command, path_or_repo, format_streams=False)
             branches.extend([branch[2:] for branch in output.split('\n')])
@@ -281,6 +297,7 @@ def delete_branch(path_or_repo, branch, local=False, force=False, remote=False):
             command = f'git push origin :{branch}'
     # print(command)
     try:
+        logger.debug(f'deleting branch {branch}')
         return _run(command, path_or_repo)
     except GitCommandException as gce:
         raise GitDeleteBrancheException(gce)
