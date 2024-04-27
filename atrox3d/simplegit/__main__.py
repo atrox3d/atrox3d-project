@@ -63,6 +63,10 @@ def main():
                             print(f'switching back to {current_branch}...')
                             git.switch(repo, current_branch)
                             print(f'current branch: {git.get_current_branch(repo)}')
+
+                            if args.push:
+                                git.push(repo)
+
                     case 'foreach':
                         raise NotImplementedError()
 

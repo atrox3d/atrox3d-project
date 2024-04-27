@@ -20,7 +20,7 @@ def parse() -> argparse.Namespace:
     clean.add_argument('-f', '--force', action='store_true')
 
     updatemaster = branch_command.add_parser('updatemaster')
-    updatemaster.add_argument('-P', '--push', default=False)
+    updatemaster.add_argument('-P', '--push', action='store_true')
     
     foreach = branch_command.add_parser('foreach')
     foreach.add_argument('foreach', nargs='+')
