@@ -27,6 +27,9 @@ class GitCommandException(subprocess.CalledProcessError):
 def pushd(fn):
     def wrapper(*args, **kwargs):
         cwd = os.getcwd()
+        logger.debug(f'saving {cwd = }')
+        _allargs = ', '.join(args + tuple(f'{k}={v}' for k, v in kwargs.items()))
+        logger.debug(f'calling {fn.__name__}({_allargs})')
         result = fn(*args, **kwargs)
         os.chdir(cwd)
         return result
@@ -34,12 +37,14 @@ def pushd(fn):
 
 @pushd
 def run(command:str, path:str) -> subprocess.CompletedProcess:
+    logger.debug(f'changing dir to {path}')
     os.chdir(Path(path).resolve())
     # shlex.split breaks on windows paths
     # use Path(path).as_posix()
     # https://stackoverflow.com/a/63534016
     args = shlex.split(command)
     try:
+        logger.debug(f'running {args}')
         completed = subprocess.run(args, check=True, shell=False, capture_output=True, text=True)
         return completed
     except subprocess.CalledProcessError as cpe:

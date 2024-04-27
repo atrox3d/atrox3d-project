@@ -88,10 +88,10 @@ def main():
                         raise NotImplementedError()
 
     except git.GitNotARepoException:
-        logger.info('please run this command inside a git repo')
+        logger.error('please run this command inside a git repo')
         sys.exit(1)
     except git.GitException as ge:
-        logger.info(f'{ge.__module__}.{ge.__class__.__qualname__}: {ge}')
+        logger.error(f'{ge.__module__}.{ge.__class__.__qualname__}: {ge}')
         sys.exit(1)
     
     
