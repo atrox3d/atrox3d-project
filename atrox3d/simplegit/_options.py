@@ -2,6 +2,7 @@ import argparse
 import logging
 
 logger = logging.getLogger(__name__)
+logger.debug(f"import {__name__}")
 
 def parse() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -44,5 +45,4 @@ def parse() -> argparse.Namespace:
     return parser.parse_args()
     
 
-logger.debug("import _options")
 
