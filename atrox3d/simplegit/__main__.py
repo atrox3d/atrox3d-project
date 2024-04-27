@@ -42,6 +42,7 @@ def main():
                             
                             print(f'merging from {current_branch}...')
                             # git merge from current_branch
+                            git.merge(repo, 'master', current_branch)
 
                             print(f'switching back to {current_branch}...')
                             git.switch(repo, current_branch)
