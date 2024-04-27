@@ -26,6 +26,7 @@ def main():
                             print(f'ERROR | repo is dirty: commit or stash changes')
                             sys.exit(1)
                         else:
+                            print(f'switching to master...')
                             git.switch(repo, 'master')
                             print(f'current branch: {git.get_current_branch(repo)}')
                             
