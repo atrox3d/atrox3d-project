@@ -276,7 +276,7 @@ def delete_branch(path_or_repo, branch, local=False, force=False, remote=False):
             command = f'git branch -d {branch}'
     if remote:
             command = f'git push origin :{branch}'
-    print(command)
+    # print(command)
     try:
         return _run(command, path_or_repo)
     except GitCommandException as gce:

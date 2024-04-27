@@ -22,6 +22,7 @@ def main():
             case 'branch':
                 match args.branch_command:
                     case 'clean':
+                        # TODO: parametrize origin and master
                         if args.local:
                             print('getting local branches...')
                             local_branches = git.get_branches(repo, local=True, remote=False)
@@ -63,7 +64,7 @@ def main():
                             git.switch(repo, current_branch)
                             print(f'current branch: {git.get_current_branch(repo)}')
                     case 'foreach':
-                        pass
+                        raise NotImplementedError()
 
     except git.GitNotARepoException:
         print('please run this command inside a git repo')
