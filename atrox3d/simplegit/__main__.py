@@ -49,6 +49,9 @@ def main():
                             print('skipping remote branches...')
 
                     case 'updatemaster':
+                        # TODO: change to update BRANCH, default=MASTER
+                        # TODO: parametrize origin and master
+                        
                         if status.dirty:
                             print(f'ERROR | repo is dirty: commit or stash changes')
                             sys.exit(1)
