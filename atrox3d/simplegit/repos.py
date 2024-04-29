@@ -1,42 +1,51 @@
 import json
 from pathlib import Path
 from typing import Generator
+import logging
 
+logger = logging.getLogger(__name__)
+logger.debug(f"import {__name__}")
 # from common import get_gitrepos
 # from vscode_workspace import VsCodeWorkspace
 # import options
 from . import git
 
-def scan(*paths: str, remote :bool=None, recurse: bool=True, absolute :bool=False) -> Generator[git.GitRepo, None, None]:
+def scan(*paths: str, has_remote :bool=None, recurse: bool=True, absolute :bool=False) -> Generator[git.GitRepo, None, None]:
+    args = ', '.join([f"{k}={v}" for k, v in locals().items()])
+    logger.debug(f'{args = }')
     '''
     returns a generator of GitRepo objects inside the root folder
     - if recurse==True, searches recursively every git repo inside each workspace item
     - if absolute==True, the paths are converted to absolute paths
+    - if has_remote is None, returns any repo
+    - if has_remote is True, returns only repos with remote
+    - if has_remote is False, returns only repos without remote
     '''
-    def filter_repo(repo:git.GitRepo, remote) -> git.GitRepo | None:
-        if remote is None:
+    def filter_repo(repo:git.GitRepo, has_remote: bool) -> git.GitRepo | None:
+        if has_remote is None:
             return repo
-        elif remote and repo.remote:
+        elif has_remote and repo.remote is not None:
             return repo
-        elif not remote and repo.remote is None:
+        elif not has_remote and repo.remote is None:
             return repo
         else:
-            return False
+            return None
 
     for path in paths:
         path = Path(path).resolve() if absolute else Path(path)
+        logger.debug(f'checking {path = }')
         if not path.exists():
             raise FileNotFoundError(path)
         
         if recurse:
             for repo_git_folder in path.glob('**/.git/'):
                 repo = git.get_repo(repo_git_folder.parent.as_posix())
-                if filter_repo(repo, remote) is not False:
+                if filter_repo(repo, has_remote) is not None:
                     yield repo
         else:
             try:
                 repo = git.get_repo(path)
-                if filter_repo(repo, remote) is not False:
+                if filter_repo(repo, has_remote) is not None:
                     yield repo
             except git.GitNotARepoException:
                 pass
@@ -44,18 +53,18 @@ def scan(*paths: str, remote :bool=None, recurse: bool=True, absolute :bool=Fals
 def collect(*paths: str, recurse: bool, absolute=False) -> dict:
     # ws = VsCodeWorkspace(workspace_path)
     repos = {}
-    for repo in scan(*paths, recurse=recurse, absolute=absolute, remote=True):
-        print(f'ADDING | {repo.path}')
+    for repo in scan(*paths, recurse=recurse, absolute=absolute, has_remote=True):
+        logger.info(f'ADDING | {repo.path}')
         repos[repo.path] = repo.remote
     return repos
 
 def save(repos: dict, json_path: str):
-    print(f'SAVING  | {json_path}')
+    logger.info(f'SAVING  | {json_path}')
     with open(json_path, 'w') as fp:
         json.dump(repos, fp, indent=2)
 
 def load(json_path: str):
-    print(f'LOADING | {json_path}')
+    logger.info(f'LOADING | {json_path}')
     with open(json_path) as fp:
         repos = json.load(fp)
     return repos
@@ -71,16 +80,16 @@ def restore(json_path:str, base_path: str, dryrun=True, breakonerrors=True):
     for path, remote in clone.items():
         dest_path = (Path(base_path) / path).resolve()
         if dest_path.exists():
-            print(f'SKIPPING | {dest_path!r} already exists')
+            logger.info(f'SKIPPING | {dest_path!r} already exists')
         if dryrun:
-            print(f'DRYRUN | CLONE TO PATH | {dest_path!r}')
+            logger.info(f'DRYRUN | CLONE TO PATH | {dest_path!r}')
         else:
-            print(f'CLONE TO PATH | {dest_path!r}')
+            logger.info(f'CLONE TO PATH | {dest_path!r}')
             try:
                 output = git.clone(remote, dest_path)
-                print(output)
+                logger.info(output)
             except git.GitException as ge:
-                print(ge)
+                logger.error(ge)
                 if breakonerrors:
                     return
 
