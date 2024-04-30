@@ -32,7 +32,7 @@ def pushd(fn):
             _allargs = ', '.join(args + tuple(f'{k}={v}' for k, v in kwargs.items()))
             logger.debug(f'calling {fn.__name__}({_allargs})')
             result = fn(*args, **kwargs)
-            os.chdir(cwd)
+            # os.chdir(cwd)
             return result
         finally:
             os.chdir(cwd)
