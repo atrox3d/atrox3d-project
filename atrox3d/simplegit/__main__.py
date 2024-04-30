@@ -91,7 +91,7 @@ def main():
         logger.error('please run this command inside a git repo')
         sys.exit(1)
     except git.GitException as ge:
-        logger.error(f'{ge.__module__}.{ge.__class__.__qualname__}: {ge}')
+        ge.print(prefix=f'{ge.__module__}.{ge.__class__.__qualname__}: ', printer=logger.error)
         sys.exit(1)
     
     
