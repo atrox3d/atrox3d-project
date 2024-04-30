@@ -17,6 +17,11 @@ class GitException(Exception):
         # super().__init__(*args)
         super().__init__('\n'.join(map(str, args)))
 
+    def print(self, printer=print):
+        for line in str(self).split('\n'):
+            printer(line)
+        printer('END EXCEPTION')
+
 class GitRepoNotFoundException(GitException): pass
 
 class GitNotARepoException(GitException): pass
