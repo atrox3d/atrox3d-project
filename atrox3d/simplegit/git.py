@@ -181,6 +181,7 @@ def get_remote(path_or_repo:str|GitRepo) -> str:
     url = None
     if result:
         name, url, mode = result.split('\n')[0].split()
+        logger.debug(f'{name, url, mode = }')
     return url
 
 def add(path_or_repo:str|GitRepo, *files:str, all:bool=False) -> str:
