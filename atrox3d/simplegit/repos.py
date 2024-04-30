@@ -38,12 +38,14 @@ def scan(*paths: str, has_remote :bool=None, recurse: bool=True, absolute :bool=
             raise FileNotFoundError(path)
         
         if recurse:
+            logger.debug(f'recurse enabled: scanning all subdir of {path}')
             for repo_git_folder in path.glob('**/.git/'):
                 repo = git.get_repo(repo_git_folder.parent.as_posix())
                 if filter_repo(repo, has_remote) is not None:
                     yield repo
         else:
             try:
+                logger.debug(f'recurse disabled: scanning {path}')
                 repo = git.get_repo(path)
                 if filter_repo(repo, has_remote) is not None:
                     yield repo
