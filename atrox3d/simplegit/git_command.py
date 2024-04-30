@@ -27,12 +27,15 @@ class GitCommandException(subprocess.CalledProcessError):
 def pushd(fn):
     def wrapper(*args, **kwargs):
         cwd = os.getcwd()
-        logger.debug(f'saving {cwd = }')
-        _allargs = ', '.join(args + tuple(f'{k}={v}' for k, v in kwargs.items()))
-        logger.debug(f'calling {fn.__name__}({_allargs})')
-        result = fn(*args, **kwargs)
-        os.chdir(cwd)
-        return result
+        try:
+            logger.debug(f'saving {cwd = }')
+            _allargs = ', '.join(args + tuple(f'{k}={v}' for k, v in kwargs.items()))
+            logger.debug(f'calling {fn.__name__}({_allargs})')
+            result = fn(*args, **kwargs)
+            os.chdir(cwd)
+            return result
+        finally:
+            os.chdir(cwd)
     return wrapper
 
 @pushd
