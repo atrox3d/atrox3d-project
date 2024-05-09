@@ -20,12 +20,18 @@ def _copyfile(src: Path, dest: Path, overwrite: bool=False) -> None:
     shutil.copy(src, dest)
 
 def copyfiles(gitignore=True, gitattributes=True) -> None:
-    if gitignore:
-        src = Path(SOURCE_DIR, '.gitignore.txt')
-        dest = Path(DEST_DIR, '.gitignore')
-        _copyfile(src, dest)
+    try:
+        if gitignore:
+            src = Path(SOURCE_DIR, '.gitignore.txt')
+            dest = Path(DEST_DIR, '.gitignore')
+            _copyfile(src, dest)
+    except FileExistsError as fee:
+        print(fee)
 
-    if gitattributes:
-        src = Path(SOURCE_DIR, '.gitattributes.txt')
-        dest = Path(DEST_DIR, '.gitattributes')
-        _copyfile(src, dest)
+    try:
+        if gitattributes:
+            src = Path(SOURCE_DIR, '.gitattributes.txt')
+            dest = Path(DEST_DIR, '.gitattributes')
+            _copyfile(src, dest)
+    except FileExistsError as fee:
+        print(fee)
