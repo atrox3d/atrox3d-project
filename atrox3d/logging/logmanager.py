@@ -65,8 +65,12 @@ def set_logger_level_for_imported_modules(level: int|str, name: str):
     imported = [member for member in vars(module).values() if isinstance(member, types.ModuleType)]
     set_logger_level_for_modules(level, *imported)
 
-import atrox3d.simplegit.git
-print(atrox3d.simplegit.git.logger)
-set_logger_level_for_imported_modules('INFO', __name__)
-print(atrox3d.simplegit.git.logger)
-get_logger(__name__, configure=True)
+if __name__ == '__main__':
+    print('import atrox3d.simplegit.git...')
+    import atrox3d.simplegit.git
+    print(f'{atrox3d.simplegit.git.logger = }')
+    print(f'set level of loggers in imported modules to INFO... ')
+    set_logger_level_for_imported_modules('INFO', __name__)
+    print(f'{atrox3d.simplegit.git.logger = }')
+
+    get_logger(__name__, configure=True)
