@@ -34,8 +34,10 @@ def setup_logging(
     logging.info('logging configured')
 
 def get_logger(name: str, level: int|str =logging.INFO, configure=False) -> logging.Logger:
-    ''' get new logger for "name" with "level", 
-        configures logging if specified or raises LoggingNotConfiguredException '''
+    ''' 
+        get new logger for "name" with "level", 
+        configures logging if specified or raises LoggingNotConfiguredException
+    '''
     if not is_logging_configured():
         if not configure:
             raise LoggingNotConfiguredException('please call setuplogging to configure logging')
