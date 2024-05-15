@@ -3,16 +3,14 @@ import types
 from pathlib import Path
 import sys
 
-
-_IS_LOGGING_CONFIGURED = False
-
 class LoggerNotFoundException(AttributeError): pass
 class AlreadyConfiguredLoggingException(Exception): pass
 class LoggingNotConfiguredException(Exception): pass
 
+_IS_LOGGING_CONFIGURED = False
+
 def is_logging_configured() -> bool:
     return _IS_LOGGING_CONFIGURED
-
 
 def setup_logging(
                     root_level: int|str =logging.INFO,
