@@ -10,12 +10,14 @@ class LoggingNotConfiguredException(Exception): pass
 _IS_LOGGING_CONFIGURED = False
 
 def is_logging_configured() -> bool:
+    ''' get the "private" value of flag '''
     return _IS_LOGGING_CONFIGURED
 
 def setup_logging(
                     root_level: int|str =logging.INFO,
                     format: str='%(levelname)5s | %(message)s'
 ) -> logging.Logger:
+    ''' configures logging if not already done '''
     global _IS_LOGGING_CONFIGURED
 
     if is_logging_configured():
@@ -32,6 +34,8 @@ def setup_logging(
     logging.info('logging configured')
 
 def get_logger(name: str, level: int|str =logging.INFO, configure=False) -> logging.Logger:
+    ''' get new logger for "name" with "level", 
+        configures logging if specified or raises LoggingNotConfiguredException '''
     if not is_logging_configured():
         if not configure:
             raise LoggingNotConfiguredException('please call setuplogging to configure logging')
@@ -44,6 +48,7 @@ def get_logger(name: str, level: int|str =logging.INFO, configure=False) -> logg
     return logger
 
 def get_module_loggers(module: types.ModuleType) -> logging.Logger:
+    ''' return loggers for the specified module '''
     loggers = []
     for element in vars(module).values():
         if isinstance(element, logging.Logger):
@@ -51,14 +56,17 @@ def get_module_loggers(module: types.ModuleType) -> logging.Logger:
     return loggers
 
 def set_module_loggers_level(module: types.ModuleType, level: int|str):
+    ''' sets all loggers for the specified module to level '''
     for logger in get_module_loggers(module):
         logger.setLevel(level)
 
 def set_logger_level_for_modules(level: int|str, *modules: types.ModuleType):
+    ''' sets all loggers for the specified moduleS to level '''
     for module in modules:
         set_module_loggers_level(module, level)
 
 def set_logger_level_for_imported_modules(level: int|str, name: str):
+    ''' sets all loggers for the imported modules from module "name" to level '''
     module = sys.modules[__name__]
     imported = [member for member in vars(module).values() if isinstance(member, types.ModuleType)]
     set_logger_level_for_modules(level, *imported)
