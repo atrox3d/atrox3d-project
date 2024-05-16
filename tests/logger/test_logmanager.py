@@ -1,5 +1,5 @@
 import unittest
-import atrox3d.logging.logmanager as lm
+import atrox3d.logger.logmanager as lm
 
 class TestLogmanager(unittest.TestCase):
 
