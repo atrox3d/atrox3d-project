@@ -22,7 +22,7 @@ def _set_logging_configured(state: bool):
 
 def setup_logging(
                     root_level: int|str =logging.INFO,
-                    format: str='%(levelname)5s | %(message)s'
+                    format: str='%(levelname)5s | %(message)s',
 ) -> logging.Logger:
     ''' configures logging if not already done '''
     global _IS_LOGGING_CONFIGURED
@@ -86,7 +86,6 @@ def set_logger_level_for_imported_modules(level: int|str, name: str):
 
 if __name__ == '__main__':
     logging.getLogger().setLevel('DEBUG')
-    
     print('import atrox3d.simplegit.git...')
     import atrox3d.simplegit.git
     print(f'{atrox3d.simplegit.git.logger = }')

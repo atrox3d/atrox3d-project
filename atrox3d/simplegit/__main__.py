@@ -9,7 +9,7 @@ handlers = [
     logging.FileHandler(LOGFILE, mode='w'),
     logging.StreamHandler()
 ]
-logging.basicConfig(level='DEBUG', format='%(levelname)5s | %(message)s', handlers=handlers)
+logging.basicConfig(level='INFO', format='%(levelname)5s | %(message)s', handlers=handlers)
 logger = logging.getLogger(__name__)
 
 from . import _options
