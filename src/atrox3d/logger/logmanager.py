@@ -23,7 +23,7 @@ def _set_logging_configured(state: bool):
 def setup_logging(
                     root_level: int|str =logging.INFO,
                     format: str='%(levelname)5s | %(message)s',
-) -> logging.Logger:
+):
     ''' configures logging if not already done '''
     global _IS_LOGGING_CONFIGURED
 
@@ -36,9 +36,13 @@ def setup_logging(
         logging.StreamHandler()
     ]
 
-    logging.basicConfig(level=root_level, format=format, handlers=handlers)
+    logging.basicConfig(level=root_level, format=format, handlers=handlers, delay=True)
+    logging.shutdown()
     _set_logging_configured(True)
     logging.debug('logging configured')
+
+def shutdown_logging():
+    logging.shutdown()
 
 def get_logger(name: str, level: int|str =logging.INFO, configure=False) -> logging.Logger:
     ''' 
