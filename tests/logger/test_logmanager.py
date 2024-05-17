@@ -8,10 +8,12 @@ from pathlib import Path
 class TestLogmanager(unittest.TestCase):
 
     def setUp(self):
+        ''' import (cached) module into global '''
         global lm
         import atrox3d.logger.logmanager as lm
     
     def tearDown(self) -> None:
+        ''' remove current module, delete module var '''
         global lm
         del sys.modules['atrox3d.logger.logmanager']
         del lm
