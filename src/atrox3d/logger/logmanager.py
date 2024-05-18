@@ -21,30 +21,33 @@ def _set_logging_configured(state: bool):
     logging.debug(f'setting value for {_IS_LOGGING_CONFIGURED = }')
 
 def setup_logging(
-                    root_level: int|str =logging.INFO,
+                    level: int|str =logging.INFO,
                     format: str='%(levelname)5s | %(message)s',
+                    logfile: str|Path=None,
+                    _file_: str=None,
+                    *morehandlers: logging.Handler
 ):
     ''' configures logging if not already done '''
-    global _IS_LOGGING_CONFIGURED
 
     if is_logging_configured():
         raise AlreadyConfiguredLoggingException(f'basicConfig already called')
     
-    LOGFILE = str(Path(__file__).parent / Path(__file__).stem) + '.log'
-    handlers = [
-        logging.FileHandler(LOGFILE, mode='w'),
-        logging.StreamHandler()
-    ]
+    handlers = [logging.StreamHandler()]
+    if _file_ is not None:
+        logfile = str(Path(_file_).parent / Path(_file_).stem) + '.log'
+    if logfile is not None:
+        handlers.append(logging.FileHandler(logfile, mode='w'))
+    handlers.extend(morehandlers)
 
-    logging.basicConfig(level=root_level, format=format, handlers=handlers, delay=True)
-    logging.shutdown()
+    logging.basicConfig(level=level, format=format, handlers=handlers, force=True)
+    logging.shutdown()  # prevents unclosed file warning
     _set_logging_configured(True)
     logging.debug('logging configured')
 
 def shutdown_logging():
     logging.shutdown()
 
-def get_logger(name: str, level: int|str =logging.INFO, configure=False) -> logging.Logger:
+def get_logger(name: str, level: int|str =None, configure=False) -> logging.Logger:
     ''' 
         get new logger for "name" with "level", 
         configures logging if specified or raises LoggingNotConfiguredException
@@ -54,11 +57,13 @@ def get_logger(name: str, level: int|str =logging.INFO, configure=False) -> logg
             logging.error(f'logging has not been configured')
             raise LoggingNotConfiguredException('please call setuplogging to configure logging')
         else:
-            logging.debug('configuring default logging')
+            logging.warning(f'logging has not been configured')
+            logging.warning('configuring default logging')
             setup_logging(level)
     
     logger = logging.getLogger(name)
-    logger.setLevel(level)
+    if level is not None:
+        logger.setLevel(level)
     logging.debug(f'logging is configured: obtaining logger {logger}')
     return logger
 
@@ -89,6 +94,13 @@ def set_logger_level_for_imported_modules(level: int|str, name: str):
     set_logger_level_for_modules(level, *imported)
 
 if __name__ == '__main__':
+    rootlogger = logging.getLogger()
+    print(rootlogger)
+    setup_logging(level='INFO')
+    print(rootlogger)
+    logger = get_logger(__name__)
+    print(logger)
+    exit()
     logging.getLogger().setLevel('DEBUG')
     print('import atrox3d.simplegit.git...')
     import atrox3d.simplegit.git

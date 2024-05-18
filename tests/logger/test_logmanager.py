@@ -3,7 +3,7 @@ import sys
 
 import atrox3d.logger.logmanager as lm
 import logging
-from pathlib import Path
+# from pathlib import Path
 
 class TestLogmanager(unittest.TestCase):
 
@@ -33,4 +33,12 @@ class TestLogmanager(unittest.TestCase):
         self.assertFalse(lm.is_logging_configured())
         lm.setup_logging()
         self.assertTrue(lm.is_logging_configured())
-        lm.get_logger(__name__)
+
+    def test_get_logger(self):
+        self.assertFalse(lm.is_logging_configured())
+        lm.setup_logging('INFO')
+        self.assertTrue(lm.is_logging_configured())
+        logger_info = lm.get_logger('info')
+        self.assertEqual('INFO', logging.getLevelName(logger_info.getEffectiveLevel()))
+        logger_debug = lm.get_logger('debug', level='DEBUG')
+        self.assertEqual('DEBUG', logging.getLevelName(logger_debug.getEffectiveLevel()))
