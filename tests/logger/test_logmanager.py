@@ -42,3 +42,11 @@ class TestLogmanager(unittest.TestCase):
         self.assertEqual('INFO', logging.getLevelName(logger_info.getEffectiveLevel()))
         logger_debug = lm.get_logger('debug', level='DEBUG')
         self.assertEqual('DEBUG', logging.getLevelName(logger_debug.getEffectiveLevel()))
+
+    def test_set_logger_level_for_imported_modules(self):
+        print('import atrox3d.simplegit.git...')
+        import atrox3d.simplegit.git
+        print(f'{atrox3d.simplegit.git.logger = }')
+        print(f'set level of loggers in imported modules to INFO... ')
+        lm.set_logger_level_for_imported_modules('INFO', __name__)
+        print(f'{atrox3d.simplegit.git.logger = }')

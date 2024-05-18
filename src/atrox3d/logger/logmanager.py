@@ -25,21 +25,24 @@ def setup_logging(
                     format: str='%(levelname)5s | %(message)s',
                     logfile: str|Path=None,
                     _file_: str=None,
-                    *morehandlers: logging.Handler
+                    **kwargs
 ):
     ''' configures logging if not already done '''
 
     if is_logging_configured():
         raise AlreadyConfiguredLoggingException(f'basicConfig already called')
     
-    handlers = [logging.StreamHandler()]
+    default_handlers = [logging.StreamHandler()]
     if _file_ is not None:
         logfile = str(Path(_file_).parent / Path(_file_).stem) + '.log'
     if logfile is not None:
-        handlers.append(logging.FileHandler(logfile, mode='w'))
-    handlers.extend(morehandlers)
+        default_handlers.append(logging.FileHandler(logfile, mode='w'))
+    default_handlers.extend(kwargs.get('handlers') or [])
 
-    logging.basicConfig(level=level, format=format, handlers=handlers, force=True)
+    params = dict(level=level, format=format, force=True)
+    params.update(kwargs)
+    logging.debug(f'calling basicConfig with {params = }')
+    logging.basicConfig(**params)
     logging.shutdown()  # prevents unclosed file warning
     _set_logging_configured(True)
     logging.debug('logging configured')
@@ -59,7 +62,10 @@ def get_logger(name: str, level: int|str =None, configure=False) -> logging.Logg
         else:
             logging.warning(f'logging has not been configured')
             logging.warning('configuring default logging')
-            setup_logging(level)
+            if level is not None:
+                setup_logging(level)
+            else:
+                setup_logging()
     
     logger = logging.getLogger(name)
     if level is not None:
@@ -96,17 +102,8 @@ def set_logger_level_for_imported_modules(level: int|str, name: str):
 if __name__ == '__main__':
     rootlogger = logging.getLogger()
     print(rootlogger)
-    setup_logging(level='INFO')
+    rootlogger.setLevel('DEBUG')
+    setup_logging(level='DEBUG')
     print(rootlogger)
     logger = get_logger(__name__)
     print(logger)
-    exit()
-    logging.getLogger().setLevel('DEBUG')
-    print('import atrox3d.simplegit.git...')
-    import atrox3d.simplegit.git
-    print(f'{atrox3d.simplegit.git.logger = }')
-    print(f'set level of loggers in imported modules to INFO... ')
-    set_logger_level_for_imported_modules('INFO', __name__)
-    print(f'{atrox3d.simplegit.git.logger = }')
-
-    get_logger(__name__, configure=True)
