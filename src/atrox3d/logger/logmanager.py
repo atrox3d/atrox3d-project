@@ -25,7 +25,7 @@ def setup_logging(
                     format: str='%(levelname)5s | %(message)s',
                     force: bool=True,
                     logfile: str|Path=None,
-                    caller_file: str=None,
+                    caller_path: str=None,
                     **kwargs
 ):
     ''' configures logging if not already done '''
@@ -34,8 +34,8 @@ def setup_logging(
         raise AlreadyConfiguredLoggingException(f'basicConfig already called')
     
     default_handlers = [logging.StreamHandler()]
-    if caller_file is not None:
-        logfile = str(Path(caller_file).parent / Path(caller_file).stem) + '.log'
+    if logfile is None and caller_path is not None:
+        logfile = str(Path(caller_path).parent / Path(caller_path).stem) + '.log'
     if logfile is not None:
         default_handlers.append(logging.FileHandler(logfile, mode='w'))
     default_handlers.extend(kwargs.get('handlers') or [])
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     print(rootlogger)
     print(f'setting root logger level to DEBUG')
     rootlogger.setLevel('DEBUG')
-    setup_logging(level='ERROR', caller_file=__file__)
+    setup_logging(level='ERROR', logfile='logfile.log', caller_path=__file__)
     print(rootlogger)
     logger = get_logger(__name__)
     print(logger)
