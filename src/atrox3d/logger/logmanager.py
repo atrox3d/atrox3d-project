@@ -23,8 +23,9 @@ def _set_logging_configured(state: bool):
 def setup_logging(
                     level: int|str =logging.INFO,
                     format: str='%(levelname)5s | %(message)s',
+                    force: bool=True,
                     logfile: str|Path=None,
-                    _file_: str=None,
+                    caller_file: str=None,
                     **kwargs
 ):
     ''' configures logging if not already done '''
@@ -33,16 +34,16 @@ def setup_logging(
         raise AlreadyConfiguredLoggingException(f'basicConfig already called')
     
     default_handlers = [logging.StreamHandler()]
-    if _file_ is not None:
-        logfile = str(Path(_file_).parent / Path(_file_).stem) + '.log'
+    if caller_file is not None:
+        logfile = str(Path(caller_file).parent / Path(caller_file).stem) + '.log'
     if logfile is not None:
         default_handlers.append(logging.FileHandler(logfile, mode='w'))
     default_handlers.extend(kwargs.get('handlers') or [])
-
-    params = dict(level=level, format=format, force=True)
-    params.update(kwargs)
-    logging.debug(f'calling basicConfig with {params = }')
-    logging.basicConfig(**params)
+    
+    kwargs.update(dict(handlers=default_handlers, level=level, format=format, force=force))
+    logging.debug(f'calling basicConfig with {kwargs = }')
+    logging.basicConfig(**kwargs)
+    
     logging.shutdown()  # prevents unclosed file warning
     _set_logging_configured(True)
     logging.debug('logging configured')
@@ -102,8 +103,9 @@ def set_logger_level_for_imported_modules(level: int|str, name: str):
 if __name__ == '__main__':
     rootlogger = logging.getLogger()
     print(rootlogger)
+    print(f'setting root logger level to DEBUG')
     rootlogger.setLevel('DEBUG')
-    setup_logging(level='DEBUG')
+    setup_logging(level='ERROR', caller_file=__file__)
     print(rootlogger)
     logger = get_logger(__name__)
     print(logger)
