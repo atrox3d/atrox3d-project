@@ -14,7 +14,7 @@ def is_logging_configured() -> bool:
     logging.debug(f'getting value for {_IS_LOGGING_CONFIGURED = }')
     return _IS_LOGGING_CONFIGURED
 
-def _set_logging_configured(state: bool):
+def _set_logging_configured(state: bool) -> None:
     ''' "private setter for the value of the flag '''
     global _IS_LOGGING_CONFIGURED
     _IS_LOGGING_CONFIGURED = state
@@ -27,7 +27,7 @@ def setup_logging(
                     logfile: str|Path=None,
                     caller_path: str=None,
                     **kwargs
-):
+) -> None:
     ''' configures logging if not already done '''
 
     if is_logging_configured():
@@ -50,7 +50,7 @@ def setup_logging(
     _set_logging_configured(True)
     logging.debug('logging configured')
 
-def shutdown_logging():
+def shutdown_logging() -> None:
     logging.shutdown()
 
 def get_logger(name: str, level: int|str =None, configure=False) -> logging.Logger:
