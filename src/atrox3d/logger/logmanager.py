@@ -34,7 +34,9 @@ def setup_logging(
         raise AlreadyConfiguredLoggingException(f'basicConfig already called')
     
     default_handlers = [logging.StreamHandler()]
-    if logfile is None and caller_path is not None:
+    if logfile and caller_path:
+        raise ValueError('setup_logging: only one of logfile and calle_path is allowed')
+    if caller_path is not None:
         logfile = str(Path(caller_path).parent / Path(caller_path).stem) + '.log'
     if logfile is not None:
         default_handlers.append(logging.FileHandler(logfile, mode='w'))
@@ -105,7 +107,7 @@ if __name__ == '__main__':
     print(rootlogger)
     print(f'setting root logger level to DEBUG')
     rootlogger.setLevel('DEBUG')
-    setup_logging(level='ERROR', logfile='logfile.log', caller_path=__file__)
+    setup_logging(level='ERROR', caller_path=__file__)
     print(rootlogger)
     logger = get_logger(__name__)
     print(logger)
