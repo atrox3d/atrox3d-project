@@ -29,7 +29,7 @@ def pushd(fn):
         cwd = os.getcwd()
         try:
             logger.debug(f'saving {cwd = }')
-            _allargs = ', '.join(args + tuple(f'{k}={v}' for k, v in kwargs.items()))
+            _allargs = ', '.join([str(arg) for arg in args] + [f'{k}={v}' for k, v in kwargs.items()])
             logger.debug(f'calling {fn.__name__}({_allargs})')
             result = fn(*args, **kwargs)
             return result
