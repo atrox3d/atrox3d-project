@@ -11,26 +11,27 @@ _IS_LOGGING_CONFIGURED = False
 
 def is_logging_configured() -> bool:
     ''' "public" getter the "private" value of flag '''
-    logging.debug(f'getting value for {_IS_LOGGING_CONFIGURED = }')
+    # logging.debug(f'getting value for {_IS_LOGGING_CONFIGURED = }')
     return _IS_LOGGING_CONFIGURED
 
 def _set_logging_configured(state: bool) -> None:
     ''' "private setter for the value of the flag '''
     global _IS_LOGGING_CONFIGURED
     _IS_LOGGING_CONFIGURED = state
-    logging.debug(f'setting value for {_IS_LOGGING_CONFIGURED = }')
+    # logging.debug(f'setting value for {_IS_LOGGING_CONFIGURED = }')
 
 def setup_logging(
                     level: int|str =logging.INFO,
-                    format: str='%(levelname)5s | %(message)s',
+                    format: str=f'%(levelname)-{len("CRITICAL")}s | %(message)s',
                     force: bool=True,
+                    shutdown:bool=False,
                     logfile: str|Path=None,
                     caller_path: str=None,
                     **kwargs
 ) -> None:
     ''' configures logging if not already done '''
 
-    if is_logging_configured():
+    if is_logging_configured() and not force:
         raise AlreadyConfiguredLoggingException(f'basicConfig already called')
     
     default_handlers = [logging.StreamHandler()]
@@ -46,9 +47,10 @@ def setup_logging(
     logging.debug(f'calling basicConfig with {kwargs = }')
     logging.basicConfig(**kwargs)
     
-    logging.shutdown()  # prevents unclosed file warning
+    if shutdown:
+        logging.shutdown()  # prevents unclosed file warning
     _set_logging_configured(True)
-    logging.debug('logging configured')
+    # logging.debug('logging configured')
 
 def shutdown_logging() -> None:
     logging.shutdown()
@@ -73,7 +75,7 @@ def get_logger(name: str, level: int|str =None, configure=False) -> logging.Logg
     logger = logging.getLogger(name)
     if level is not None:
         logger.setLevel(level)
-    logging.debug(f'logging is configured: obtaining logger {logger}')
+    # logging.debug(f'logging is configured: obtaining logger {logger}')
     return logger
 
 if __name__ == '__main__':
