@@ -8,6 +8,7 @@ class AlreadyConfiguredLoggingException(Exception): pass
 class LoggingNotConfiguredException(Exception): pass
 
 _IS_LOGGING_CONFIGURED = False
+_ROOT_LOGGER_FORMAT = f'%(levelname)-{len("CRITICAL")}s | %(message)s'
 
 def is_logging_configured() -> bool:
     ''' "public" getter the "private" value of flag '''
@@ -22,7 +23,7 @@ def _set_logging_configured(state: bool) -> None:
 
 def setup_logging(
                     level: int|str =logging.INFO,
-                    format: str=f'%(levelname)-{len("CRITICAL")}s | %(message)s',
+                    format: str=_ROOT_LOGGER_FORMAT,
                     force: bool=True,
                     shutdown:bool=False,
                     logfile: str|Path=None,
@@ -40,12 +41,19 @@ def setup_logging(
     if caller_path is not None:
         logfile = str(Path(caller_path).parent / Path(caller_path).stem) + '.log'
     if logfile is not None:
-        default_handlers.append(logging.FileHandler(logfile, mode='w'))
+        default_handlers.append(logging.FileHandler(logfile, mode='a'))
     default_handlers.extend(kwargs.get('handlers') or [])
     
-    kwargs.update(dict(handlers=default_handlers, level=level, format=format, force=force))
+    kwargs.update(dict(
+            handlers=default_handlers, 
+            level=level, 
+            format=format,
+            force=force)
+        )
     logging.debug(f'calling basicConfig with {kwargs = }')
     logging.basicConfig(**kwargs)
+
+    _ROOT_LOGGER_FORMAT = format
     
     if shutdown:
         logging.shutdown()  # prevents unclosed file warning
@@ -55,7 +63,26 @@ def setup_logging(
 def shutdown_logging() -> None:
     logging.shutdown()
 
-def get_logger(name: str, level: int|str =None, configure=False) -> logging.Logger:
+def get_rootlogger_format() -> str:
+    return _ROOT_LOGGER_FORMAT
+
+def add_stream(_logger:logging.Logger, stream=None, format:str=None, level: int|str =None):
+    sh = logging.StreamHandler(stream)
+    formatter = logging.Formatter(get_rootlogger_format())
+    sh.setFormatter(formatter)
+    if level:
+        sh.setLevel(level)
+    _logger.addHandler(sh)
+
+def add_logfile(_logger:logging.Logger, logfile:Path|str, level: int|str =None):
+    fh = logging.FileHandler(logfile)
+    formatter = logging.Formatter(get_rootlogger_format())
+    fh.setFormatter(formatter)
+    if level:
+        fh.setLevel(level)
+    _logger.addHandler(fh)
+
+def get_logger(name: str, level: int|str =None, logfile=None, configure=False) -> logging.Logger:
     ''' 
         get new logger for "name" with "level", 
         configures logging if specified or raises LoggingNotConfiguredException
@@ -75,6 +102,9 @@ def get_logger(name: str, level: int|str =None, configure=False) -> logging.Logg
     logger = logging.getLogger(name)
     if level is not None:
         logger.setLevel(level)
+    
+    if logfile is not None:
+        add_logfile(logger, logfile, level)
     # logging.debug(f'logging is configured: obtaining logger {logger}')
     return logger
 
