@@ -80,13 +80,20 @@ def restore(json_path:str, base_path: str, dryrun=True, breakonerrors=True):
     clone = load(json_path)
 
     for path, remote in clone.items():
-        dest_path = (Path(base_path) / path).resolve()
+        path = Path(path).as_posix()
+        dest_path: Path  = (Path(base_path) / path).resolve()
+        # print(dest_path)
+        # dest_path.mkdir()
+
+
+
+        # continue
         if dest_path.exists():
             logger.info(f'SKIPPING | {dest_path!r} already exists')
         if dryrun:
             logger.info(f'DRYRUN | CLONE TO PATH | {dest_path!r}')
         else:
-            logger.info(f'CLONE TO PATH | {dest_path!r}')
+            logger.info(f'CLONE TO PATH | {dest_path.resolve()}')
             try:
                 output = git.clone(remote, dest_path)
                 logger.info(output)
