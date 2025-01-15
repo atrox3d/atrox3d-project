@@ -25,6 +25,8 @@ class GitCommandException(subprocess.CalledProcessError):
         return '\n'.join(out)
 
 def pushd(fn):
+    ''' changes back to pwd after execution '''
+    
     def wrapper(*args, **kwargs):
         cwd = os.getcwd()
         try:

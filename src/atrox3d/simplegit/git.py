@@ -32,10 +32,12 @@ from .exceptions import (
     GitDeleteBrancheException,
 )
 
+
 def get_repo(path:str, name=None) -> GitRepo:
     '''
     factory method, creates GitRepo object from path
     '''
+    
     if is_repo(path):
         logger.debug(f'getting repo from {path = }')
         remote = get_remote(path)
@@ -43,7 +45,9 @@ def get_repo(path:str, name=None) -> GitRepo:
         return repo
     raise GitNotARepoException(f'path {path} is not a git repo')
 
+
 def is_repo(path:str) -> bool:
+
     repodir =  Path(path)
     logger.debug(f'checking repo in {path = }')
     if repodir.exists():
@@ -70,7 +74,9 @@ def is_repo(path:str) -> bool:
 #         print('-' * 80)
 #         sys.exit()
 
+
 def _parse_status_filename(line:str):
+
     logger.debug(f'parsing {line = }')
     index = workspace = rest = filename = newname = None
     index, workspace = line[:2]
@@ -81,7 +87,8 @@ def _parse_status_filename(line:str):
         filename = rest
 
     return index, workspace, filename, newname
-        
+
+
 def get_status(path_or_repo:str|GitRepo) -> GitStatus:
     '''
     factory method, creates GitStatus object from git status command
@@ -94,6 +101,7 @@ def get_status(path_or_repo:str|GitRepo) -> GitStatus:
     the first character shows the index status while the second shows 
     the workspace status
     '''
+
     command = 'git status --branch --porcelain'
     # path = path_or_repo.path if isinstance(path_or_repo, GitRepo) else path_or_repo
     # try:
@@ -167,6 +175,7 @@ def _run(command, path_or_repo:str|GitRepo, format_streams=True) -> str:
         return ret
     # except GitCommandException as gce:
         # raise GitException(gce)
+
 
 def get_remote(path_or_repo:str|GitRepo) -> str:
     '''

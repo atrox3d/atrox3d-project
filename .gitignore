@@ -3,3 +3,6 @@ venv/
 *.egg-info/
 build/
 *.log
+.venv/
+
+.DS_Store
